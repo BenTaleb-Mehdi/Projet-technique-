@@ -3,7 +3,7 @@ marp: true
 theme: default
 _class: lead
 paginate: true
-backgroundColor: #f9f9f9ff
+backgroundColor: #ffffffff
 style: |
   section {
     font-size: 22px;
@@ -77,3 +77,9 @@ style: |
 ### Fonctionalite
 
 ![w:1150 usecase](images/usecase.png)
+
+---
+
+### Conception
+
+![w:1050 diagramme de class](images/diagramme_class.png)

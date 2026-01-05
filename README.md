@@ -50,7 +50,7 @@ style: |
 ---
 # Contexte
 
-![w:600 2TUP](images/2TUP.png)
+![w:500 2TUP](images/2TUP.png)
 
 
 ---
@@ -83,3 +83,10 @@ style: |
 ### Conception
 
 ![w:1050 diagramme de class](images/diagramme_class.png)
+
+---
+
+### Sujet - Live coding
+
+- Un bouton “Ajouter” qui ouvre une modale pour créer un nouvel élément.
+- Une barre de recherche filtrant des éléments par titre.

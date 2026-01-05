@@ -49,7 +49,7 @@ style: |
 
 ---
 # Contexte
-![w:600 2TUP](images/2TUP.PNG)
+![w:600 2TUP](images/2TUP.png)
 ---
 
 # Analyse

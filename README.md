@@ -50,7 +50,25 @@ style: |
 ---
 # Contexte
 ![w:600 2TUP](images/2TUP.PNG)
+
 ---
+# Analyse Technique
 
-# Analyse
+### Les Technologies a Utiliser (parte 1)
+1. Base de donnee : Mysql 
+2. Archittecture N-tier : Services
+3. Framwork : Laravel
+4. Archittecture : MVC
+5. Moteur de vues Blade
+6. AJAX 
+---
+### Les Technologies a Utiliser (parte 2)
+7. Upload image
+8. Laravel Multilingue
+9. Vite
+10. Preline Ui
+11. Lucide Library (icons)
 
+
+---
+### Analyse

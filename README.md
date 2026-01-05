@@ -48,12 +48,9 @@ style: |
 **Encadré par :** M. ESSARRAJ Fouad
 
 ---
-
 # Contexte
-
 ![w:600 2TUP](images/2TUP.PNG)
-
 ---
 
-
+# Analyse
 

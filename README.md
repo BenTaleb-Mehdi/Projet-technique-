@@ -74,6 +74,6 @@ style: |
 
 ---
 
-### Analyse
+### Fonctionalite
 
-![w:1150 2TUP](images/usecase.png)
+![w:1150 usecase](images/usecase.png)

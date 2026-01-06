@@ -48,13 +48,13 @@ style: |
 **Encadré par :** M. ESSARRAJ Fouad
 
 ---
-# Contexte
+# Contexte 
 
 ![w:500 2TUP](images/2TUP.png)
 
 
 ---
-# Analyse Technique
+# Analyse Technique (Besoin)
 
 ### Les Technologies a Utiliser (parte 1)
 1. Base de donnee : Mysql 
@@ -74,13 +74,13 @@ style: |
 
 ---
 
-### Fonctionalite
+### Fonctionalite (Analyse)
 
 ![w:1150 usecase](images/usecase.png)
 
 ---
 
-### Conception
+### Conception 
 
 ![w:1050 diagramme de class](images/diagramme_class.png)
 

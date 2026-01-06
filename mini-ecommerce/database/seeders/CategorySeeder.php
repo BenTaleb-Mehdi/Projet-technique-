@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\Category;
 
 class CategorySeeder extends Seeder
 {
@@ -11,22 +11,17 @@ class CategorySeeder extends Seeder
     {
         $path = database_path('seeders/data/categories_test.csv');
 
-        if (!file_exists($path)) {
-            return;
-        }
+        if (!file_exists($path)) return;
 
         $file = fopen($path, 'r');
-        $headers = fgetcsv($file); // Skip header
+        fgetcsv($file); // skip header
 
         while (($row = fgetcsv($file)) !== false) {
             [$label] = $row;
 
-            DB::table('categories')->updateOrInsert(
+            Category::updateOrCreate(
                 ['label' => $label],
-                [
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]
+                ['label' => $label]
             );
         }
 

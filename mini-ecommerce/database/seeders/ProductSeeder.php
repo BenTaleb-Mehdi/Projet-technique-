@@ -3,7 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\Product;
+use App\Models\Category;
 
 class ProductSeeder extends Seeder
 {
@@ -11,26 +12,25 @@ class ProductSeeder extends Seeder
     {
         $path = database_path('seeders/data/products_test.csv');
 
-        if (!file_exists($path)) {
-            return;
-        }
+        if (!file_exists($path)) return;
 
         $file = fopen($path, 'r');
-        $headers = fgetcsv($file); // skip headers
+        fgetcsv($file); // skip header
 
         while (($row = fgetcsv($file)) !== false) {
-            if (count($row) < 5) continue; // skip invalid rows
+            if (count($row) < 6) continue;
 
-            [$name, $description, $image_url, $price, $user_id] = $row;
+            [$name, $description, $image_url, $price, $user_id, $category_label] = $row;
 
-            DB::table('products')->updateOrInsert(
+            $category = Category::firstOrCreate(['label' => $category_label]);
+
+            Product::updateOrCreate(
                 ['name' => $name, 'user_id' => $user_id],
                 [
                     'description' => $description,
                     'image_url' => $image_url,
                     'price' => $price,
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                    'category_id' => $category->id,
                 ]
             );
         }

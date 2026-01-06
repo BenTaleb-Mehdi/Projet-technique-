@@ -1,0 +1,28 @@
+classDiagram
+    class User {
+        -int id
+        -String username
+        -String email
+    
+    }
+
+    class Product {
+        -int id
+        -String name
+        -String description
+        -String imageUrl
+        -double price
+        -DateTime createdAt
+        -DateTime updatedAt
+        +getDetails() String
+    }
+
+    class Category {
+        -int id
+        -String label
+        -DateTime createdAt
+        -DateTime updatedAt
+    }
+
+    User "1" --> "*" Product : manages
+    Product "*" -- "*" Category : belongs to

@@ -46,6 +46,13 @@ style: |
 ### Mini E-Commerce (Product,Categories)
 **Réalisé par :** Ben Taleb Mehdi  
 **Encadré par :** M. ESSARRAJ Fouad
+**Date :** 05/01/2026
+
+---
+
+### Waterfall 
+
+![w:900 Waterfall](images/Waterfall.png)
 
 ---
 # Contexte 
@@ -54,7 +61,7 @@ style: |
 
 
 ---
-# Analyse Technique (Besoin)
+# Exigences - Analyse Technique
 
 ### Les Technologies a Utiliser (parte 1)
 1. Base de donnee : Mysql 
@@ -74,7 +81,8 @@ style: |
 
 ---
 
-### Fonctionalite (Analyse)
+### Analyse - Fonctionnalités
+
 
 ![w:1150 usecase](images/usecase.png)
 

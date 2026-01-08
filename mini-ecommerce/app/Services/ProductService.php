@@ -1,30 +1,35 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Product;
-
 
 class ProductService
 {
     public function getAll()
     {
-        return Product::with('categories', 'user')->get();
+        return Product::with('category')->latest()->get();
     }
 
-    public function store(array $data, int $userId)
+    public function create(array $data)
     {
-        return Product::create([
-            'name' => $data['name'],
-            'description' => $data['description'] ?? null,
-            'image_url' => $data['image_url'] ?? null,
-            'price' => $data['price'],
-            'user_id' => $userId,
-        ]);
+        return Product::create($data);
     }
 
-    public function delete(int $id)
+    public function find($id)
+    {
+        return Product::findOrFail($id);
+    }
+
+    public function update($id, array $data)
+    {
+        $product = $this->find($id);
+        $product->update($data);
+        return $product;
+    }
+
+    public function delete($id)
     {
         return Product::destroy($id);
     }
 }
-

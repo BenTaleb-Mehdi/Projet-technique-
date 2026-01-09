@@ -1,4 +1,4 @@
 name,description,image_url,price,user_id,category_label
-iPhone 15,Dernier iPhone,iPhone-15-Pro-Max.jpg,999,1,Électronique,Phones
+iPhone 15,Dernier iPhone,iPhone-15-Pro-Max.jpg,999,1,Électronique|Phones
 Livre Laravel,Apprendre Laravel,laravelbook.png,29,2,Livres
 T-shirt,T-shirt en coton,tshirt.png,19,3,Vêtements

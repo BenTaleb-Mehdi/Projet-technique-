@@ -4,8 +4,14 @@
 
 <div class="flex flex-col w-full bg-white rounded-xl shadow-sm border border-gray-200">
   <div class="text-end p-5">
-    <button type="button" class="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none" aria-haspopup="dialog" aria-expanded="false" aria-controls="hs-danger-alert" data-hs-overlay="#hs-danger-alert">
-      Open modal
+    <button type="button" 
+            onclick="openCreateModal()"
+            class="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none" 
+            aria-haspopup="dialog" 
+            aria-expanded="false" 
+            aria-controls="hs-danger-alert" 
+            data-hs-overlay="#hs-danger-alert">
+      Add Product
     </button>
   </div>
   
@@ -18,8 +24,10 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
+              <th scope="col" class="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">Image</th>
               <th scope="col" class="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">Product Name</th>
               <th scope="col" class="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
+              <th scope="col" class="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
               <th scope="col" class="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">Description</th>
               <th scope="col" class="px-6 py-3 text-end text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
             </tr>
@@ -50,8 +58,10 @@
        </div>
       <!-- Card Section -->
       <div class="w-full px-4 py-10 sm:px-6 lg:px-8  mx-auto">
-        <form id="productForm" >
-      
+        <form id="productForm">
+          <input type="hidden" name="_method" id="methodField" value="POST">
+          <input type="hidden" id="productId">
+
           <div class="bg-white rounded-xl shadow-xs">
             <div class="pt-0 p-4 sm:pt-0 sm:p-7">
               <div class="space-y-4 sm:space-y-6">
@@ -60,7 +70,7 @@
                     Product name
                   </label>
 
-                  <input id="af-submit-app-project-name" type="text" name="name" class="py-1.5 sm:py-2 px-3 pe-11 block w-full border-gray-200 shadow-2xs rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" placeholder="Enter project name">
+                  <input id="productName" type="text" name="name" class="py-1.5 sm:py-2 px-3 pe-11 block w-full border-gray-200 shadow-2xs rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" placeholder="Enter product name">
                 </div>
 
         
@@ -85,23 +95,25 @@
                   </label>
                 </div>
                 <div class="space-y-2">
-                  <label for="af-submit-app-project-name" class="inline-block text-sm font-medium text-gray-800 mt-2.5">
+                  <label for="af-submit-app-price" class="inline-block text-sm font-medium text-gray-800 mt-2.5">
                     Price
                   </label>
 
-                  <input id="af-submit-app-project-name" type="text" name="price" class="py-1.5 sm:py-2 px-3 pe-11 block w-full border-gray-200 shadow-2xs rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" placeholder="Enter project name">
+                  <input id="productPrice" type="text" name="price" class="py-1.5 sm:py-2 px-3 pe-11 block w-full border-gray-200 shadow-2xs rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" placeholder="Enter price">
                 </div>
 
                 <div class="space-y-2">
-                  <label for="af-submit-app-category" class="inline-block text-sm font-medium text-gray-800 mt-2.5">
-                    Category
+                  <label class="inline-block text-sm font-medium text-gray-800 mt-2.5">
+                    Select Categories
                   </label>
-                  <select id="af-submit-app-category" name="category_id" class="py-1.5 sm:py-2 px-3 pe-9 block w-full border-gray-200 shadow-2xs rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none">
-                    <option selected>Select a category</option>
+                  <div class="grid grid-cols-2 gap-2 mt-2">
                     @foreach($categories as $category)
-                      <option value="{{ $category->id }}">{{ $category->label }}</option>
+                    <div class="flex">
+                        <input type="checkbox" name="categories[]" value="{{ $category->id }}" class="shrink-0 mt-0.5 border-gray-200 rounded text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" id="cat-{{ $category->id }}">
+                        <label for="cat-{{ $category->id }}" class="text-sm text-gray-500 ms-3">{{ $category->label }}</label>
+                    </div>
                     @endforeach
-                  </select>
+                  </div>
                 </div>
 
              
@@ -111,14 +123,14 @@
                     Description
                   </label>
 
-                  <textarea id="af-submit-app-description" name="description" class="py-1.5 sm:py-2 px-3 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" rows="6" placeholder="A detailed summary will better explain your products to the audiences. Our users will see this in your dedicated product page."></textarea>
+                  <textarea id="productDescription" name="description" class="py-1.5 sm:py-2 px-3 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" rows="6" placeholder="A detailed summary..."></textarea>
                 </div>
               </div>
               <!-- End Grid -->
 
               <div class="mt-5 flex gap-x-2">
                 <button type="submit" id="submitBtn" class="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-                  Submit your project
+                  Submit
                 </button>
                 <button type="button" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-50" data-hs-overlay="#hs-danger-alert">
                 Cancel
@@ -136,6 +148,41 @@
 </div>
 
 <script>
+  let isEditing = false;
+  let currentProductId = null;
+
+  function openCreateModal() {
+      isEditing = false;
+      currentProductId = null;
+      document.getElementById('productForm').reset();
+      document.getElementById('methodField').value = 'POST';
+      document.getElementById('submitBtn').innerText = 'Create Product';
+      
+      // Uncheck all checkboxes
+      document.querySelectorAll('input[name="categories[]"]').forEach(cb => cb.checked = false);
+  }
+
+  function editProduct(product) {
+      isEditing = true;
+      currentProductId = product.id;
+      
+      document.getElementById('productForm').reset();
+      document.getElementById('methodField').value = 'PUT'; // Laravel spoofing for PUT
+      document.getElementById('submitBtn').innerText = 'Update Product';
+      
+      // Populate fields
+      document.getElementById('productName').value = product.name;
+      document.getElementById('productPrice').value = product.price;
+      document.getElementById('productDescription').value = product.description;
+      
+      // Handle categories
+      // Assuming product.categories is an array of objects
+      const categoryIds = product.categories.map(c => c.id);
+      document.querySelectorAll('input[name="categories[]"]').forEach(cb => {
+          cb.checked = categoryIds.includes(parseInt(cb.value));
+      });
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     const productForm = document.querySelector('#productForm');
     const tableBody = document.querySelector('#product-table-body');
@@ -144,9 +191,17 @@
         e.preventDefault();
         const formData = new FormData(productForm);
 
+        let url = "{{ route('products.store') }}";
+        if (isEditing && currentProductId) {
+             url = `/admin/products/${currentProductId}`; // Assuming resource route convention or we can generate it differently if needed
+             // NOTE: Since route() helper in JS is static, we construct the URL manually or Use a global js variable if strictly needed.
+             // Manual construction /admin/products/{id} is standard.
+             // Also note: FormData with PUT method in Laravel usually requires _method field (which we added) and standard POST request.
+        }
+
         try {
-            const response = await fetch("{{ route('products.store') }}", {
-                method: "POST",
+            const response = await fetch(url, {
+                method: "POST", // Always POST when using FormData (with _method=PUT for updates)
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
                     'Accept': 'text/html' // Expect HTML fragment
@@ -156,8 +211,17 @@
 
             if (response.ok) {
                 const htmlRow = await response.text();
-                // Prepend the new row to the table
-                tableBody.insertAdjacentHTML('afterbegin', htmlRow);
+                
+                if (isEditing) {
+                    // Replace existing row
+                    const existingRow = document.getElementById(`row-${currentProductId}`);
+                    if (existingRow) {
+                        existingRow.outerHTML = htmlRow;
+                    }
+                } else {
+                    // Prepend new row
+                    tableBody.insertAdjacentHTML('afterbegin', htmlRow);
+                }
                 
                 // Reset and Close
                 productForm.reset();

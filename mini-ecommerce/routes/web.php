@@ -13,6 +13,7 @@ Route::get('/products/{product}', [HomeController::class, 'show'])
   
 Route::get('/admin', [ProductController::class, 'index'])->name('admin.products.index');
 Route::post('/admin/products/store', [ProductController::class, 'store'])->name('products.store');
+Route::put('/admin/products/{product}', [ProductController::class, 'update'])->name('products.update');
 
   
 

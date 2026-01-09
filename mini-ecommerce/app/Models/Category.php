@@ -11,9 +11,9 @@ class Category extends Model
 
     protected $fillable = ['label'];
 
-    // One category has many products
+   
     public function products()
     {
-        return $this->hasMany(Product::class);
+        return $this->belongsToMany(Product::class);
     }
 }

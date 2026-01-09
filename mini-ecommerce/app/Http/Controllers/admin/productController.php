@@ -29,7 +29,8 @@ class ProductController extends Controller {
             'name' => 'required',
             'image' => 'nullable|image|max:2048',
             'price' => 'required|numeric',
-            'category_id' => 'required|exists:categories,id'
+            'categories' => 'required|array',
+            'categories.*' => 'exists:categories,id'
         ]);
 
         $data = $request->all();
@@ -44,6 +45,28 @@ class ProductController extends Controller {
         $product = $this->productService->create($data);
 
         // This returns ONLY the HTML inside the row partial
+        return view('admin.products.row', compact('product'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required',
+            'image' => 'nullable|image|max:2048',
+            'price' => 'required|numeric',
+            'categories' => 'required|array',
+            'categories.*' => 'exists:categories,id'
+        ]);
+
+        $data = $request->all();
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('products', 'public');
+            $data['image_url'] = $path;
+        }
+
+        $product = $this->productService->update($id, $data);
+
         return view('admin.products.row', compact('product'));
     }
 }

@@ -9,17 +9,22 @@ class Product extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'image_url', 'price', 'user_id', 'category_id'];
+    protected $fillable = ['name', 'description', 'image_url', 'price', 'user_id'];
 
-    // Product belongs to a category
-    public function category()
+    
+    public function categories()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsToMany(Category::class);
     }
 
-    // Product belongs to a user
+   
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getCategoryLabelAttribute()
+    {
+        return $this->categories->pluck('label')->implode(', ');
     }
 }

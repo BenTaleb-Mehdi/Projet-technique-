@@ -24,15 +24,17 @@ class ProductSeeder extends Seeder
 
             $category = Category::firstOrCreate(['label' => $category_label]);
 
-            Product::updateOrCreate(
+            $product = Product::updateOrCreate(
                 ['name' => $name, 'user_id' => $user_id],
                 [
                     'description' => $description,
                     'image_url' => $image_url,
                     'price' => $price,
-                    'category_id' => $category->id,
                 ]
             );
+
+            // Attach category
+            $product->categories()->syncWithoutDetaching([$category->id]);
         }
 
         fclose($file);

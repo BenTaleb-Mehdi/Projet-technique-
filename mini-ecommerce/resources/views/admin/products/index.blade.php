@@ -44,8 +44,6 @@
   </div>
 </div>
 
-
-
 <div id="hs-danger-alert" class="hs-overlay hidden size-full fixed top-0 start-0 z-80 overflow-x-hidden overflow-y-auto" role="dialog" tabindex="-1" aria-labelledby="hs-danger-alert-label">
   
   <div class="hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all md:max-w-2xl md:w-full m-3 md:mx-auto">
@@ -148,18 +146,21 @@
 </div>
 
 <script>
+
   let isEditing = false;
   let currentProductId = null;
 
   function openCreateModal() {
       isEditing = false;
       currentProductId = null;
-      document.getElementById('productForm').reset();
+      const form = document.getElementById('productForm');
+      form.reset();
       document.getElementById('methodField').value = 'POST';
       document.getElementById('submitBtn').innerText = 'Create Product';
-      
-      // Uncheck all checkboxes
       document.querySelectorAll('input[name="categories[]"]').forEach(cb => cb.checked = false);
+      
+      // Open the modal manually if needed
+      if (window.HSOverlay) HSOverlay.open(document.querySelector('#hs-danger-alert'));
   }
 
   function editProduct(product) {
@@ -167,7 +168,7 @@
       currentProductId = product.id;
       
       document.getElementById('productForm').reset();
-      document.getElementById('methodField').value = 'PUT'; // Laravel spoofing for PUT
+      document.getElementById('methodField').value = 'PUT'; 
       document.getElementById('submitBtn').innerText = 'Update Product';
       
       // Populate fields
@@ -175,12 +176,13 @@
       document.getElementById('productPrice').value = product.price;
       document.getElementById('productDescription').value = product.description;
       
-      // Handle categories
-      // Assuming product.categories is an array of objects
       const categoryIds = product.categories.map(c => c.id);
       document.querySelectorAll('input[name="categories[]"]').forEach(cb => {
           cb.checked = categoryIds.includes(parseInt(cb.value));
       });
+
+      // Open the modal
+      if (window.HSOverlay) HSOverlay.open(document.querySelector('#hs-danger-alert'));
   }
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -193,18 +195,15 @@
 
         let url = "{{ route('products.store') }}";
         if (isEditing && currentProductId) {
-             url = `/admin/products/${currentProductId}`; // Assuming resource route convention or we can generate it differently if needed
-             // NOTE: Since route() helper in JS is static, we construct the URL manually or Use a global js variable if strictly needed.
-             // Manual construction /admin/products/{id} is standard.
-             // Also note: FormData with PUT method in Laravel usually requires _method field (which we added) and standard POST request.
+            url = `/admin/products/${currentProductId}`; 
         }
 
         try {
             const response = await fetch(url, {
-                method: "POST", // Always POST when using FormData (with _method=PUT for updates)
+                method: "POST", // Keep as POST for file uploads
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'text/html' // Expect HTML fragment
+                    'Accept': 'text/html'
                 },
                 body: formData
             });
@@ -213,30 +212,29 @@
                 const htmlRow = await response.text();
                 
                 if (isEditing) {
-                    // Replace existing row
                     const existingRow = document.getElementById(`row-${currentProductId}`);
                     if (existingRow) {
                         existingRow.outerHTML = htmlRow;
                     }
                 } else {
-                    // Prepend new row
                     tableBody.insertAdjacentHTML('afterbegin', htmlRow);
                 }
                 
-                // Reset and Close
-                productForm.reset();
-                if (typeof HSOverlay !== 'undefined') {
+                // Close Modal
+                if (window.HSOverlay) {
                     HSOverlay.close(document.querySelector('#hs-danger-alert'));
                 }
+                productForm.reset();
             } else {
-                console.error('Server returned:', response.status, response.statusText);
-                alert("Error saving product.");
+                const errorData = await response.json();
+                console.error('Validation Errors:', errorData);
+                alert("Error: " + (errorData.message || "Could not save product."));
             }
         } catch (error) {
             console.error("Error:", error);
-            alert("An error occurred.");
         }
     });
-});
+  });
+
 </script>
 @endsection

@@ -1,6 +1,6 @@
 <tr class="hover:bg-gray-50 transition" id="row-{{ $product->id }}">
   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-      <img src="{{ Str::startsWith($product->image_url, 'http') ? $product->image_url : asset('storage/' . $product->image_url) }}" class="h-10 w-10 rounded-full object-cover" alt="">
+      <img src="{{ asset('images/' . $product->image_url) }}" class="h-10 w-10 rounded-full object-cover" alt="">
   </td>
   <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-800">
     {{ $product->name }}

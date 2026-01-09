@@ -3,23 +3,25 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\CategoryService;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
 use App\Models\Category;
 
-class ProductController extends Controller {
-    private $productService;
+class ProductController extends Controller {private $productService;
+    private $categoryService; // Added this line
 
-    public function __construct(ProductService $productService)
+    public function __construct(ProductService $productService, CategoryService $categoryService)
     {
         $this->productService = $productService;
+        $this->categoryService = $categoryService;
     }
 
     public function index()
     {
         $products = $this->productService->getAll();
-        $categories = Category::all();
-       
+        $categories = $this->categoryService->getAll();
+        
         return view('admin.products.index', compact('products', 'categories'));
     }
 
@@ -35,7 +37,7 @@ class ProductController extends Controller {
 
         $data = $request->all();
 
-        $data['user_id'] = auth()->id() ?? 1; // Fallback to 1 if not logged in (for testing) or ensure login
+        $data['user_id'] = auth()->id() ?? 1;
 
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('products', 'public');

@@ -11,6 +11,7 @@ class ProductService
     public function __construct(Product $product)
     {
         $this->product = $product;
+        
     }
 
     public function getAll()
@@ -20,8 +21,8 @@ class ProductService
 
     public function create(array $data)
     {
-        $categories = $data['categories'] ?? []; // Extract categories
-        unset($data['categories']); // Remove from product data
+        $categories = $data['categories'] ?? []; 
+        unset($data['categories']);
 
         $product = $this->product->create($data);
         $product->categories()->attach($categories);
@@ -50,7 +51,7 @@ class ProductService
     public function delete($id)
     {
         $product = $this->find($id);
-        $product->categories()->detach(); // cleanup
+        $product->categories()->detach();
         return $product->delete();
     }
 }

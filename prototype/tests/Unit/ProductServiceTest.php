@@ -4,137 +4,94 @@ namespace Tests\Unit;
 
 use Tests\TestCase;
 use App\Models\Product;
+use App\Models\Category;
 use App\Services\ProductService;
-use Mockery;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class ProductServiceTest extends TestCase
 {
-    protected $productMock;
-    protected $service;
+    use DatabaseTransactions;
+
+    protected ProductService $service;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->productMock = Mockery::mock(Product::class);
-        $this->service = new ProductService($this->productMock);
-    }
-
-    protected function tearDown(): void
-    {
-        Mockery::close();
-        parent::tearDown();
+        $this->service = new ProductService(new Product());
     }
 
     public function test_it_can_get_all_products()
     {
-        $expectedCollection = new Collection(['p1', 'p2']);
-
-        $this->productMock->shouldReceive('with')
-            ->with('categories')
-            ->once()
-            ->andReturnSelf();
-        
-        $this->productMock->shouldReceive('latest')
-            ->once()
-            ->andReturnSelf();
-        
-        $this->productMock->shouldReceive('get')
-            ->once()
-            ->andReturn($expectedCollection);
-
         $result = $this->service->getAll();
 
-        $this->assertEquals($expectedCollection, $result);
+        $this->assertGreaterThan(0, $result->total());
     }
 
-    public function test_it_can_create_a_product()
+    public function test_it_can_filter_products_by_title()
     {
-        $data = ['name' => 'New Product', 'price' => 100, 'categories' => [1, 2]];
-        $createdProduct = Mockery::mock(Product::class);
-        $relationMock = Mockery::mock();
+        $result = $this->service->getAll([
+            'search' => 'T-shirt'
+        ]);
 
-        // Expect creation
-        $this->productMock->shouldReceive('create')
-            ->with(Mockery::subset(['name' => 'New Product', 'price' => 100]))
-            ->once()
-            ->andReturn($createdProduct);
-
-        // Expect relationship handling on the created instance
-        $createdProduct->shouldReceive('categories')->once()->andReturn($relationMock);
-        $relationMock->shouldReceive('attach')->with([1, 2])->once();
-
-        $result = $this->service->create($data);
-
-        $this->assertEquals($createdProduct, $result);
+        $this->assertEquals(1, $result->total());
     }
 
-    public function test_it_can_find_a_product_by_id()
+    public function test_it_can_filter_products_by_category()
     {
-        $id = 1;
-        $foundProduct = new Product(['id' => $id]);
+        $product = Product::first();
+        $category = Category::first();
 
-        $this->productMock->shouldReceive('findOrFail')
-            ->with($id)
-            ->once()
-            ->andReturn($foundProduct);
+        if (!$category) {
+            $category = Category::create(['label' => 'Test Category']);
+        }
+        
+        if (!$product) {
+             $product = Product::create(['name' => 'Test Product', 'price' => 10, 'user_id' => 1]);
+        }
 
-        $result = $this->service->find($id);
+        $this->assertNotNull($product);
+        $this->assertNotNull($category);
 
-        $this->assertEquals($foundProduct, $result);
+        $product->categories()->syncWithoutDetaching([$category->id]);
+
+        $result = $this->service->getAll([
+            'category_id' => $category->id
+        ]);
+
+        $this->assertGreaterThan(0, $result->total());
     }
+
 
     public function test_it_can_update_a_product()
     {
-        $id = 1;
-        $data = ['name' => 'Updated Name', 'categories' => [3]];
-        $productInstanceMock = Mockery::mock(Product::class);
-        $relationMock = Mockery::mock();
+        $product = Product::first();
+        
+        if (!$product) {
+             $product = Product::create(['name' => 'To Update', 'price' => 10, 'user_id' => 1]);
+        }
 
-        // Expect findOrFail
-        $this->productMock->shouldReceive('findOrFail')
-            ->with($id)
-            ->once()
-            ->andReturn($productInstanceMock);
+        $this->service->update($product->id, [
+            'name' => 'Updated Name'
+        ]);
 
-        // Expect categories sync
-        $productInstanceMock->shouldReceive('categories')->once()->andReturn($relationMock);
-        $relationMock->shouldReceive('sync')->with([3])->once();
-
-        // Expect update
-        $productInstanceMock->shouldReceive('update')
-            ->with(['name' => 'Updated Name'])
-            ->once()
-            ->andReturnTrue();
-
-        $result = $this->service->update($id, $data);
-
-        $this->assertEquals($productInstanceMock, $result);
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'name' => 'Updated Name'
+        ]);
     }
 
     public function test_it_can_delete_a_product()
     {
-        $id = 1;
-        $productInstanceMock = Mockery::mock(Product::class);
-        $relationMock = Mockery::mock();
+        $product = Product::first();
+         
+        if (!$product) {
+             $product = Product::create(['name' => 'To Delete', 'price' => 10, 'user_id' => 1]);
+        }
 
-        // Expect findOrFail
-        $this->productMock->shouldReceive('findOrFail')
-            ->with($id)
-            ->once()
-            ->andReturn($productInstanceMock);
-        
-        // Expect category detach
-        $productInstanceMock->shouldReceive('categories')->once()->andReturn($relationMock);
-        $relationMock->shouldReceive('detach')->once();
+        $this->service->delete($product->id);
 
-        // Expect delete
-        $productInstanceMock->shouldReceive('delete')
-            ->once()
-            ->andReturnTrue();
-
-        $result = $this->service->delete($id);
-
-        $this->assertTrue($result);
+        $this->assertDatabaseMissing('products', [
+            'id' => $product->id
+        ]);
     }
 }

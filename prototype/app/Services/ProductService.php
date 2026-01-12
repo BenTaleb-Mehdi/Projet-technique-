@@ -11,12 +11,23 @@ class ProductService
     public function __construct(Product $product)
     {
         $this->product = $product;
-        
     }
 
-    public function getAll()
+    public function getAll(array $filters = [])
     {
-        return $this->product->with('categories')->latest()->get();
+        $query = $this->product->with('categories')->latest();
+
+        if (isset($filters['search'])) {
+            $query->where('name', 'like', "%{$filters['search']}%");
+        }
+
+        if (isset($filters['category_id'])) {
+            $query->whereHas('categories', function ($q) use ($filters) {
+                $q->where('categories.id', $filters['category_id']);
+            });
+        }
+        
+        return $query->paginate(10);
     }
 
     public function create(array $data)

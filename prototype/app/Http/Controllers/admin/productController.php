@@ -51,9 +51,11 @@ class ProductController extends Controller {
 
 
     $product = $this->productService->create($data);
+    
     if ($request->has('categories')) {
         $product->categories()->attach($request->categories);
     }
+
     $product->load('categories');
         return view('admin.products.partials.row', compact('product'));
     }

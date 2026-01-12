@@ -1,0 +1,62 @@
+<?php
+
+namespace App\Http\Controllers\admin;
+
+use App\Http\Controllers\Controller;
+use App\Services\CategoryService;
+use App\Services\ProductService;
+use Illuminate\Http\Request;
+use App\Models\Category;
+
+class ProductController extends Controller {
+    private $productService;
+    private $categoryService;
+
+    public function __construct(ProductService $productService, CategoryService $categoryService)
+    {
+        $this->productService = $productService;
+        $this->categoryService = $categoryService;
+    }
+
+    public function index()
+    {
+        $products = $this->productService->getAll();
+        $categories = $this->categoryService->getAll();
+        return view('admin.products.index', compact('products', 'categories'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'productName' => 'required|string|max:255',
+            'productImage' => 'nullable|image|max:2048',
+            'productPrice' => 'required|numeric',
+            'productDescription' => 'required|string',
+            'categories' => 'nullable|array', 
+            'categories.*' => 'exists:categories,id'
+        ]);
+
+
+        $data = [
+            'name'        => $request->productName,
+            'price'       => $request->productPrice,
+            'description' => $request->productDescription,
+            'user_id'     => auth()->id() ?? 1,
+        ];
+
+        if ($request->hasFile('productImage')) {
+            $path = $request->file('productImage')->store('products', 'public');
+            $data['image_url'] = $path;
+        }
+
+
+    $product = $this->productService->create($data);
+    if ($request->has('categories')) {
+        $product->categories()->attach($request->categories);
+    }
+    $product->load('categories');
+        return view('admin.products.partials.row', compact('product'));
+    }
+
+
+}

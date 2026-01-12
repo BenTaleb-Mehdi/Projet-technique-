@@ -94,18 +94,23 @@ class ProductServiceTest extends TestCase
     public function test_it_returns_paginated_products()
     {
     
-                for ($i = 1; $i <= 12; $i++) {
-                    Product::create([
-                        'name' => "Product $i",
-                        'price' => 100,
-                        'user_id' => $this->user->id
-                    ]);
-                }
-                $result = $this->service->getAll();
-                $this->assertInstanceOf(LengthAwarePaginator::class, $result);
-                $this->assertEquals(12, $result->total());
-                $this->assertCount(10, $result->items());
-                $this->assertTrue($result->hasMorePages());
+        for ($i = 1; $i <= 12; $i++) {
+            Product::create([
+                'name' => "Product $i",
+                'price' => 100,
+                'user_id' => $this->user->id
+            ]);
+        }
+        $result = $this->service->getAll();
+
+        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
+
+        $this->assertEquals(12, $result->total());
+
+        $this->assertCount(10, $result->items());
+
+        $this->assertTrue($result->hasMorePages());
+
     }
     public function test_it_can_delete_a_product()
     {

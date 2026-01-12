@@ -1,6 +1,5 @@
 <tr>
     <td class="p-1 border border-gray-300">{{ $product->name }}</td>
-    <td class="p-1 border border-gray-300"><img src="{{ asset('storage/' . $product->image_url) }}" alt="{{ $product->name }}" width="50"></td>
     <td class="p-1 border border-gray-300">${{ number_format($product->price, 2) }}</td>  
     <td class="p-1 border border-gray-300">
         @foreach($product->categories as $category)

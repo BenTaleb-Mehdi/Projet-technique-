@@ -75,7 +75,7 @@
         <thead class="p-1 border border-gray-300">
             <tr>
                 <th class="p-1 border border-gray-300">Name</th>
-                <th class="p-1 border border-gray-300">Image</th>
+    
                 <th class="p-1 border border-gray-300">Price</th>
                 <th class="p-1 border border-gray-300">Categories</th>
                 <th class="p-1 border border-gray-300">Description</th>
@@ -97,6 +97,8 @@
   btnOpen.addEventListener('click', ()=>{
     form.classList.toggle('active');
   })
+
+  
     document.getElementById('productForm').addEventListener('submit', async function(e) {
         e.preventDefault();
 

@@ -11,13 +11,20 @@ class Product extends Model
 
     protected $fillable = ['name', 'description', 'image_url', 'price', 'user_id'];
 
+    
     public function categories()
     {
         return $this->belongsToMany(Category::class);
     }
 
+   
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getCategoryLabelAttribute()
+    {
+        return $this->categories->pluck('label')->implode(', ');
     }
 }

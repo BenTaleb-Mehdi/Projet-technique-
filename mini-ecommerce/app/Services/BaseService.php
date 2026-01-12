@@ -10,6 +10,5 @@ class BaseService
     {
         return $query->paginate($perPage);
     }
-
     
 }

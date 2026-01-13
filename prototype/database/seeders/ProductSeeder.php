@@ -20,10 +20,11 @@ class ProductSeeder extends Seeder
         while (($row = fgetcsv($file)) !== false) {
             if (count($row) < 6) continue;
 
-            [$name, $description, $image_url, $price, $user_id, $category_label] = $row;
-
-            $category = Category::firstOrCreate(['label' => $category_label]);
-
+            [$name, $description, $image_url, $price, $user_id, $category_labels] = $row;
+            
+            $labels = explode('|', $category_labels);
+            
+            // Create/Update product first
             $product = Product::updateOrCreate(
                 ['name' => $name, 'user_id' => $user_id],
                 [
@@ -33,8 +34,11 @@ class ProductSeeder extends Seeder
                 ]
             );
 
-            // Attach category
-            $product->categories()->syncWithoutDetaching([$category->id]);
+            foreach ($labels as $label) {
+                if (empty($label)) continue;
+                $category = Category::firstOrCreate(['label' => trim($label)]);
+                $product->categories()->syncWithoutDetaching([$category->id]);
+            }
         }
 
         fclose($file);

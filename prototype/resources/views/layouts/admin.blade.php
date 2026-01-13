@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini Ecommerce</title>
+    <title>{{ __('views.admin.title') }}</title>
 
-       @vite(['resources/css/app.css', 'resources/js/app.js'])
+       @vite(['resources/css/app.css', 'resources/js/app.js','resources/js/form.js','resources/js/search.js'])
 </head>
 <body>
 

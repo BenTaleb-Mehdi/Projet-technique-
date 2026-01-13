@@ -18,9 +18,9 @@ class ProductController extends Controller {
         $this->categoryService = $categoryService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $products = $this->productService->getAll();
+        $products = $this->productService->getAll($request->all());
         $categories = $this->categoryService->getAll();
         return view('admin.products.index', compact('products', 'categories'));
     }

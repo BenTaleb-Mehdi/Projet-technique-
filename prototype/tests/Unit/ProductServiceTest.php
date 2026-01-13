@@ -41,13 +41,7 @@ class ProductServiceTest extends TestCase
         $product = Product::first();
         $category = Category::first();
 
-        if (!$category) {
-            $category = Category::create(['label' => 'Test Category']);
-        }
         
-        if (!$product) {
-             $product = Product::create(['name' => 'Test Product', 'price' => 10, 'user_id' => 1]);
-        }
 
         $this->assertNotNull($product);
         $this->assertNotNull($category);
@@ -66,9 +60,7 @@ class ProductServiceTest extends TestCase
     {
         $product = Product::first();
         
-        if (!$product) {
-             $product = Product::create(['name' => 'To Update', 'price' => 10, 'user_id' => 1]);
-        }
+      
 
         $this->service->update($product->id, [
             'name' => 'Updated Name'
@@ -83,10 +75,7 @@ class ProductServiceTest extends TestCase
     public function test_it_can_delete_a_product()
     {
         $product = Product::first();
-         
-        if (!$product) {
-             $product = Product::create(['name' => 'To Delete', 'price' => 10, 'user_id' => 1]);
-        }
+    
 
         $this->service->delete($product->id);
 

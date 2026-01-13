@@ -41,8 +41,6 @@ class ProductServiceTest extends TestCase
         $product = Product::first();
         $category = Category::first();
 
-        
-
         $this->assertNotNull($product);
         $this->assertNotNull($category);
 

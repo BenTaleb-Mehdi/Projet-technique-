@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
+
 <style>
    form{
     display: flex;
@@ -37,7 +38,7 @@
     }
 </style>
 
-<div class="flex flex-col gap-5 max-w-500">
+<div class="flex flex-col gap-5 w-full">
 
     <form id="productForm" enctype="multipart/form-data">
         @csrf
@@ -48,19 +49,19 @@
         <input type="number" step="0.01" name="productPrice" required>
 
         <label>Select Categories:</label>
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 10px;">
-    @foreach($categories as $category)
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <input type="checkbox" 
-                   name="categories[]" 
-                   value="{{ $category->id }}" 
-                   id="cat_{{ $category->id }}">
-            <label style="margin-top: 0;" for="cat_{{ $category->id }}">
-                {{ $category->label }}
-            </label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 10px;">
+            @foreach($categories as $category)
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" 
+                        name="categories[]" 
+                        value="{{ $category->id }}" 
+                        id="cat_{{ $category->id }}">
+                    <label style="margin-top: 0;" for="cat_{{ $category->id }}">
+                        {{ $category->label }}
+                    </label>
+                </div>
+            @endforeach
         </div>
-    @endforeach
-</div>
 
         <label>Product description</label>
         <textarea name="productDescription" required></textarea>
@@ -71,12 +72,11 @@
         <button type="submit">Create Product</button>
     </form>
 
-
-    <div class="max-w-500">
-            <div class="flex  justify-between mb-3">
-                <button id="btnopen">Add product</button>
-                <input type="text" id="searchInput" placeholder="Search products..." class="form-control ">
-            </div>
+    <div class="w-full">
+        <div class="flex justify-between mb-3">
+            <button id="btnopen">Add product</button>
+            <input type="text" id="searchInput" placeholder="Search products..." class="form-control ">
+        </div>
         <table border="1" style="width: 100%;">
             <thead class="p-1 border border-gray-300">
                 <tr>
@@ -97,6 +97,7 @@
 </div>
 
 <script>
+
   const form = document.getElementById('productForm');
   const btnOpen = document.getElementById('btnopen');
 
@@ -127,7 +128,7 @@
                 alert('Product created successfully!');
                 form.reset();
             } else {
-                alert('Error: ' + ( 'Check console for details'));
+                alert('Error: ' );
             }
         } catch (error) {
             console.error('Fetch error:', error);
@@ -143,11 +144,8 @@
         debounceTimer = setTimeout(async () => {
             const response = await fetch(`{{ route('admin.products.index') }}?search=${e.target.value}`);
             const html = await response.text();
-            
-            // Extract only the product rows from the full page HTML
             const doc = new DOMParser().parseFromString(html, 'text/html');
             const newRows = doc.getElementById('productBody').innerHTML;
-            
             document.getElementById('productBody').innerHTML = newRows;
         }, 300);
     });

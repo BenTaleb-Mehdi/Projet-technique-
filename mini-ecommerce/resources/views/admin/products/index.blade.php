@@ -200,7 +200,7 @@
 
         try {
             const response = await fetch(url, {
-                method: "POST", // Keep as POST for file uploads
+                method: "POST",
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
                     'Accept': 'text/html'

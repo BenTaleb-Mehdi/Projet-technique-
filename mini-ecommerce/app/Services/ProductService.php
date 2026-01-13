@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Product;
 
-class ProductService
+class ProductService extends BaseService
 {
     protected $product;
 
@@ -14,9 +14,21 @@ class ProductService
         
     }
 
-    public function getAll()
+       public function getAll(array $filters = [])
     {
-        return $this->product->with('categories')->latest()->get();
+        $query = $this->product->with('categories')->latest();
+
+        if (isset($filters['search'])) {
+            $query->where('name', 'like', "%{$filters['search']}%");
+        }
+
+        if (isset($filters['category_id'])) {
+            $query->whereHas('categories', function ($q) use ($filters) {
+                $q->where('categories.id', $filters['category_id']);
+            });
+        }
+        
+        return $this->applyPagination($query);
     }
 
     public function create(array $data)

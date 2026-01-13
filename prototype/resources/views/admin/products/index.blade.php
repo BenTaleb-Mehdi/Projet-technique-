@@ -37,7 +37,8 @@
     }
 </style>
 
-<div class="flex flex-col gap-5 w-full">
+<div class="flex flex-col gap-5 max-w-500">
+
     <form id="productForm" enctype="multipart/form-data">
         @csrf
         <label>Product name</label>
@@ -69,25 +70,30 @@
 
         <button type="submit">Create Product</button>
     </form>
-<div class="max-w-500">
-  <button id="btnopen">Add product</button>
-    <table border="1" style="width: 50%;">
-        <thead class="p-1 border border-gray-300">
-            <tr>
-                <th class="p-1 border border-gray-300">Name</th>
-    
-                <th class="p-1 border border-gray-300">Price</th>
-                <th class="p-1 border border-gray-300">Categories</th>
-                <th class="p-1 border border-gray-300">Description</th>
-            </tr>
-        </thead>
-        <tbody id="productBody">
-            @foreach($products as $product)
-                @include('admin.products.partials.row', ['product' => $product])
-            @endforeach
-        </tbody>
-    </table>
-</div>
+
+
+    <div class="max-w-500">
+            <div class="flex  justify-between mb-3">
+                <button id="btnopen">Add product</button>
+                <input type="text" id="searchInput" placeholder="Search products..." class="form-control ">
+            </div>
+        <table border="1" style="width: 100%;">
+            <thead class="p-1 border border-gray-300">
+                <tr>
+                    <th class="p-1 border border-gray-300">Name</th>    
+                    <th class="p-1 border border-gray-300">Price</th>
+                    <th class="p-1 border border-gray-300">Categories</th>
+                    <th class="p-1 border border-gray-300">Description</th>
+                </tr>
+            </thead>
+            <tbody id="productBody">
+                @foreach($products as $product)
+                    @include('admin.products.partials.row', compact('product'))
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+
 </div>
 
 <script>
@@ -121,13 +127,29 @@
                 alert('Product created successfully!');
                 form.reset();
             } else {
-                const errorData = await response.json();
-                console.error(errorData);
-                alert('Error: ' + (errorData.message || 'Check console for details'));
+                alert('Error: ' + ( 'Check console for details'));
             }
         } catch (error) {
             console.error('Fetch error:', error);
         }
+    });
+
+
+
+    let debounceTimer;
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(async () => {
+            const response = await fetch(`{{ route('admin.products.index') }}?search=${e.target.value}`);
+            const html = await response.text();
+            
+            // Extract only the product rows from the full page HTML
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            const newRows = doc.getElementById('productBody').innerHTML;
+            
+            document.getElementById('productBody').innerHTML = newRows;
+        }, 300);
     });
 </script>
 @endsection

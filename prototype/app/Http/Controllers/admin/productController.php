@@ -18,43 +18,40 @@ class ProductController extends Controller {
         $this->categoryService = $categoryService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $products = $this->productService->getAll();
+        $products = $this->productService->getAll($request->all());
         $categories = $this->categoryService->getAll();
         return view('admin.products.index', compact('products', 'categories'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'productName' => 'required|string|max:255',
-            'productImage' => 'nullable|image|max:2048',
-            'productPrice' => 'required|numeric',
+        $validated = $request->validate([
+            'productName'        => 'required|string|max:255',
+            'productImage'       => 'nullable|image|max:2048',
+            'productPrice'       => 'required|numeric',
             'productDescription' => 'required|string',
-            'categories' => 'nullable|array', 
-            'categories.*' => 'exists:categories,id'
+            'categories'         => 'nullable|array',
+            'categories.*'       => 'exists:categories,id'
         ]);
 
 
         $data = [
-            'name'        => $request->productName,
-            'price'       => $request->productPrice,
-            'description' => $request->productDescription,
+            'name'        => $validated['productName'],
+            'price'       => $validated['productPrice'],
+            'description' => $validated['productDescription'],
             'user_id'     => auth()->id() ?? 1,
+            'categories'  => $request->categories, 
         ];
 
         if ($request->hasFile('productImage')) {
-            $path = $request->file('productImage')->store('products', 'public');
-            $data['image_url'] = $path;
+            $data['image_url'] = $request->file('productImage')->store('products', 'public');
         }
 
 
-    $product = $this->productService->create($data);
-    if ($request->has('categories')) {
-        $product->categories()->attach($request->categories);
-    }
-    $product->load('categories');
+        $product = $this->productService->create($data)->load('categories');
+
         return view('admin.products.partials.row', compact('product'));
     }
 

@@ -19,7 +19,6 @@ class ProductSeeder extends Seeder
 
         while (($row = fgetcsv($file)) !== false) {
             if (count($row) < 6) continue;
-
             [$name, $description, $image_url, $price, $user_id, $category_label] = $row;
 
             $category = Category::firstOrCreate(['label' => $category_label]);

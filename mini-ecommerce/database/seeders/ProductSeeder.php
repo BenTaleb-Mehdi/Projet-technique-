@@ -15,7 +15,7 @@ class ProductSeeder extends Seeder
         if (!file_exists($path)) return;
 
         $file = fopen($path, 'r');
-        fgetcsv($file); // skip header
+        fgetcsv($file); 
 
         while (($row = fgetcsv($file)) !== false) {
             if (count($row) < 6) continue;
@@ -33,7 +33,7 @@ class ProductSeeder extends Seeder
                 ]
             );
 
-            // Attach category
+            
             $product->categories()->syncWithoutDetaching([$category->id]);
         }
 

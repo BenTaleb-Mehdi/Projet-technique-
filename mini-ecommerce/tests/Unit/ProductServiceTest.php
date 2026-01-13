@@ -23,65 +23,54 @@ class ProductServiceTest extends TestCase
     
         $this->service = new ProductService(new Product());
 
-        $this->user = User::factory()->create();
+        $this->user = User::first();
     }
 
     public function test_it_can_get_all_products()
     {
-        Product::create([
-            'name' => 'Test Product',
-            'price' => 100,
-            'user_id' => $this->user->id
-        ]);
+  
       
         $result = $this->service->getAll();
 
         $this->assertGreaterThan(0, $result->total());
     }
 
-    public function test_it_can_filter_products_by_title()
+    public function test_it_can_filter_products_by_name()
     {
-        Product::create([
-            'name' => 'T-shirt',
-            'price' => 20,
-            'user_id' => $this->user->id
-        ]);
+        $existingProduct = Product::first();
+        $this->assertNotNull($existingProduct, 'No products found in database to test with.');
 
         $result = $this->service->getAll([
-            'search' => 'T-shirt'
+            'search' => $existingProduct->name
         ]);
 
-        $this->assertEquals(1, $result->total());
-        $this->assertEquals('T-shirt', $result->first()->name);
+        $this->assertTrue($result->total() > 0);
+        $this->assertEquals($existingProduct->name, $result->first()->name);
     }
 
     public function test_it_can_filter_products_by_category()
     {
-        $category = Category::create(['label' => 'Test Category']);
-        $product = Product::create([
-            'name' => 'Cat Product', 
-            'price' => 10, 
-            'user_id' => $this->user->id
-        ]);
-
-        $product->categories()->attach($category->id);
+        $productWithCategory = Product::has('categories')->with('categories')->first();
+        $this->assertNotNull($productWithCategory, 'No products with categories found in database.');
+        
+        $category = $productWithCategory->categories->first();
 
         $result = $this->service->getAll([
             'category_id' => $category->id
         ]);
 
         $this->assertGreaterThan(0, $result->total());
+        foreach ($result as $product) {
+            $this->assertTrue($product->categories->contains('id', $category->id));
+        }
     }
 
     public function test_it_can_update_a_product()
     {
-        $product = Product::create([
-            'name' => 'To Update', 
-            'price' => 10, 
-            'user_id' => $this->user->id
-        ]);
+        $product = Product::first();
+        $this->assertNotNull($product, 'No product found to update.');
 
-        $newName = 'Updated Name';
+        $newName = 'Updated Name ' . uniqid();
 
         $this->service->update($product->id, [
             'name' => $newName

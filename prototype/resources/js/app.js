@@ -1,4 +1,4 @@
 import './bootstrap';
-import 'preline'
-import './form'
-import './search'
+import 'preline';
+import './form';
+import './search';

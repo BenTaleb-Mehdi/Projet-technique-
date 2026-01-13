@@ -19,7 +19,7 @@
 
           <!-- Card Section -->
           <div class="w-full sm:px-6 lg:px-8 lg:py-5 mx-auto">
-            <form id="productForm" enctype="multipart/form-data">
+            <form id="productForm" enctype="multipart/form-data" data-url="{{ route('products.store') }}">
               @csrf
               <!-- Card -->
               <div class="w-full bg-white rounded-xl shadow-xs">

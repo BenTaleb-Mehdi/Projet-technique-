@@ -4,11 +4,14 @@
         const form = e.target;
         const formData = new FormData(form);
 
+        const url = form.dataset.url;
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
         try {
-            const response = await fetch("{{ route('products.store') }}", {
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-CSRF-TOKEN': csrfToken,
                     'Accept': 'text/html' 
                 },
                 body: formData

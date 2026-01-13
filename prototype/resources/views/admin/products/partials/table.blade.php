@@ -9,7 +9,7 @@
           <path d="m21 21-4.3-4.3"></path>
         </svg>
       </div>
-      <input class="py-2.5 py-3 ps-10 w-full pe-4 block border border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" id="searchInput" type="text" role="combobox" aria-expanded="false" placeholder="{{ __('actions.type_name') }}" value="" data-hs-combo-box-input="">
+      <input class="py-2.5 py-3 ps-10 w-full pe-4 block border border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" id="searchInput" type="text" role="combobox" aria-expanded="false" placeholder="{{ __('actions.type_name') }}" value="" data-hs-combo-box-input="" data-url="{{ route('admin.products.index') }}">
     </div>
 
 

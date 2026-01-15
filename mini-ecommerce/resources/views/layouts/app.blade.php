@@ -10,13 +10,9 @@
 <body>
 
 
-<ul class="list-disc space-x-6 p-5">
-  <li class="inline-block"><a class="inline-flex items-center gap-x-2 text-sm whitespace-nowrap text-blue-600 hover:text-blue-70 focus:outline-hidden focus:text-blue-700" href="#">
-      <a href="{{ route('admin.products.index') }}" class="text-blue-800 font-bold" >Admin</a>
-    </a></li>
-</ul>
+@include('products.partials.navbar')
 
-<div class="flex items-center  p-20">
+<div class="flex items-center  px-20 py-8">
     @yield('content')
 </div>
 

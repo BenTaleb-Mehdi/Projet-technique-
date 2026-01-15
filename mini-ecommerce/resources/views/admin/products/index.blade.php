@@ -21,11 +21,8 @@
             </button>
         </div>
     </div>
-
-    <div class="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden">
-        
-        <div class="p-4 border-b border-gray-200 bg-white">
-            <div class="flex flex-wrap items-center gap-4 justify-end">
+    <div class="p-4 border-b border-gray-200 bg-white">
+            <div class="flex flex-wrap items-left gap-4 justify-end">
                 <div class="relative w-full sm:w-72">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <i data-lucide="search" class="w-4 h-4 text-gray-400"></i>
@@ -54,6 +51,9 @@
                 </div>
             </div>
         </div>
+    <div class="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden">
+        
+     
 
         <div class="overflow-x-auto">
             <table id="productsTable" class="w-full divide-y divide-gray-200">

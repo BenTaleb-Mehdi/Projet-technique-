@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-7xl px-4 sm:px-6 lg:px-8 py-12 mx-auto">
+<div class="max-w-7xl px-4 sm:px-6 lg:px-8 py-0 mx-auto">
     <div class="mb-8">
         <a href="{{ route('products.index') }}" class="text-sm text-gray-500 hover:text-black inline-flex items-center gap-2">
             ← Back to products

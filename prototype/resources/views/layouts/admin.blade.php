@@ -6,7 +6,7 @@
     <title>{{ __('views.admin.title') }}</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-       @vite(['resources/css/app.css', 'resources/js/app.js','resources/js/form.js','resources/js/search.js'])
+       @vite(['resources/css/app.css', 'resources/js/app.js','resources/js/main.js'])
 </head>
 <body>
 

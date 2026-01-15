@@ -7,7 +7,6 @@ document.getElementById("Formproduct").addEventListener("submit", async (e) => {
         const response = await fetch(form.dataset.url, {
             method: "POST",
             headers: {
-               
                 "X-CSRF-TOKEN": document
                     .querySelector('meta[name="csrf-token"]')
                     .getAttribute("content"),
@@ -22,11 +21,12 @@ document.getElementById("Formproduct").addEventListener("submit", async (e) => {
                 .getElementById("productBody")
                 .insertAdjacentHTML("beforeend", htmlRow);
             form.reset();
-            const model = document.getElementById("hs-scroll-inside-body-modal");
-            if(model && typeof HSOverlay !== "undefined"){
-                HSOverlay.close(model)
+            const model = document.getElementById(
+                "hs-scroll-inside-body-modal"
+            );
+            if (model && typeof HSOverlay !== "undefined") {
+                HSOverlay.close(model);
             }
-
 
             console.log("product added");
         }
@@ -35,7 +35,6 @@ document.getElementById("Formproduct").addEventListener("submit", async (e) => {
     }
 });
 
-// --- 2. RECHERCHE (Search with Debounce) ---
 let timer;
 
 document.getElementById("searchInput").addEventListener("input", async (e) => {

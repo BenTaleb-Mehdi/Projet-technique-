@@ -17,9 +17,9 @@ class ProductController extends Controller {private $productService;
         $this->categoryService = $categoryService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $products = $this->productService->getAll();
+        $products = $this->productService->getAll($request->all());
         $categories = $this->categoryService->getAll();
         
         return view('admin.products.index', compact('products', 'categories'));
@@ -46,7 +46,12 @@ class ProductController extends Controller {private $productService;
 
         $product = $this->productService->create($data);
 
-        // This returns ONLY the HTML inside the row partial
+        if($request->has('categories')){
+            $product->categories()->attach($request->categories);
+        }
+
+        $product->load('categories');
+
         return view('admin.products.row', compact('product'));
     }
 

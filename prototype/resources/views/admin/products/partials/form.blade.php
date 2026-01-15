@@ -1,5 +1,3 @@
-
-
 <div id="hs-scroll-inside-body-modal" class="hs-overlay hidden size-full fixed top-0 start-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none lg:w-full" role="dialog" tabindex="-1" aria-labelledby="hs-scroll-inside-body-modal-label">
   <div class="hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:max-w-7xl sm:w-full m-3 h-[calc(100%-56px)] sm:mx-auto lg:w-full">
     <div class="max-h-full overflow-hidden flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto">
@@ -19,7 +17,7 @@
 
           <!-- Card Section -->
           <div class="w-full sm:px-6 lg:px-8 lg:py-5 mx-auto">
-            <form id="productForm" enctype="multipart/form-data" data-url="{{ route('products.store') }}">
+            <form id="Formproduct" enctype="multipart/form-data" data-url="{{ route('products.store') }}">
               @csrf
               <!-- Card -->
               <div class="w-full bg-white rounded-xl shadow-xs">

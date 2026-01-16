@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-<main id="content" role="main" class="w-full pt-10 px-4 sm:px-6 md:px-8  min-h-screen">
+<main id="content" role="main" class="w-full  px-4 sm:px-6 md:px-8">
     
     <div class="mb-8 flex items-center justify-between flex-wrap gap-4">
         <div>
@@ -23,17 +23,17 @@
     </div>
     <div class="p-4 border-b border-gray-200 bg-white">
             <div class="flex flex-wrap items-left gap-4 justify-end">
-                <div class="relative w-full sm:w-72">
+                <div class="relative w-full sm:w-100">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <i data-lucide="search" class="w-4 h-4 text-gray-400"></i>
                     </div>
-                    <input id="productSearch" type="text" placeholder="Rechercher un produit..."  data-url="{{ route('admin.products.index') }}"
-                           class="py-2 pl-10 pr-4 block w-full bg-gray-50 border border-gray-200 text-gray-800 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                    <input id="productSearch" type="text" placeholder="Rechercher un produit..."  data-url="{{ route('admin.partials.index') }}"
+                           class="py-3 pl-10 pr-4 block w-full bg-gray-50 border border-gray-200 text-gray-800 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
                 </div>
 
                 <div class="relative inline-block text-left w-full sm:w-56">
                     <!-- Select -->
-                    <select id="categoryFilter" data-url="{{ route('admin.products.index') }}" data-hs-select='{
+                    <select id="categoryFilter" data-url="{{ route('admin.partials.index') }}" data-hs-select='{
                         "placeholder": "Sélectionner...",
                         "toggleTag": "<button type=\"button\" aria-expanded=\"false\"></button>",
                         "toggleClasses": "hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative py-3 ps-4 pe-9 flex gap-x-2 text-nowrap w-full cursor-pointer bg-white border border-gray-200 rounded-lg text-start text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500",
@@ -69,7 +69,7 @@
                 </thead>
                 <tbody id="product-table-body" class="divide-y divide-gray-200 bg-white">
                     @foreach($products as $product)
-                        @include('admin.products.row', ['product' => $product])
+                        @include('admin.partials.row', ['product' => $product])
                     @endforeach
                 </tbody>
             </table>
@@ -83,6 +83,6 @@
     </div>
 </main>
 
-@include('admin.products.form')
+@include('admin.partials.form')
 
 @endsection

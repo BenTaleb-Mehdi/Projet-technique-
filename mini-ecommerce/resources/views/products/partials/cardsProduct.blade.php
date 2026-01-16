@@ -25,7 +25,7 @@
             <div class="mt-5">
                 <a href="{{ route('products.show', $product->id) }}" 
                    class="py-3 px-4 w-full inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-xl border border-transparent bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:bg-blue-600 transition-colors">
-                    View Product
+                    View Product <i data-lucide="arrow-up-right"></i>  
                 </a>
             </div>
             

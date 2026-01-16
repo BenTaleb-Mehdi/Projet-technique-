@@ -22,7 +22,11 @@ class ProductController extends Controller {private $productService;
         $products = $this->productService->getAll($request->all());
         $categories = $this->categoryService->getAll();
         
-        return view('admin.products.index', compact('products', 'categories'));
+        if ($request->ajax()) {
+            return view('admin.partials.rows', compact('products'));
+        }
+        
+        return view('admin.partials.index', compact('products', 'categories'));
     }
 
     public function store(Request $request)
@@ -52,7 +56,7 @@ class ProductController extends Controller {private $productService;
 
         $product->load('categories');
 
-        return view('admin.products.row', compact('product'));
+        return view('admin.partials.row', compact('product'));
     }
 
     public function update(Request $request, $id)
@@ -74,6 +78,6 @@ class ProductController extends Controller {private $productService;
 
         $product = $this->productService->update($id, $data);
 
-        return view('admin.products.row', compact('product'));
+        return view('admin.partials.row', compact('product'));
     }
 }

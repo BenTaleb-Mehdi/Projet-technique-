@@ -20,17 +20,15 @@
   </td>
   <td class="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
     <div class="flex justify-end gap-x-3">
-      <a class="text-blue-600 hover:text-blue-800 font-semibold" href="{{ route('products.show', $product->id) }}">
-        View
-      </a>
+
       <button type="button" 
               onclick='editProduct(@json($product))'
               class="text-indigo-600 hover:text-indigo-900 font-semibold"
               data-hs-overlay="#hs-danger-alert">
-        Edit
+      <i data-lucide="pencil" class="w-5"></i>  
       </button>
       <button type="button" class="text-red-600 hover:text-red-800 font-semibold">
-        Delete
+      <i data-lucide="octagon-x" class="w-5"></i>  
       </button>
     </div>
   </td>

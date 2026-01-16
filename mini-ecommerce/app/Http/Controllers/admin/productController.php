@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\Category;
 
 class ProductController extends Controller {private $productService;
-    private $categoryService; // Added this line
+    private $categoryService; 
 
     public function __construct(ProductService $productService, CategoryService $categoryService)
     {
@@ -39,31 +39,35 @@ class ProductController extends Controller {private $productService;
             'categories.*' => 'exists:categories,id'
         ]);
 
-        $data = $request->all();
+        try {
+            $data = $request->all();
 
-        $data['user_id'] = auth()->id() ?? 1;
+            $data['user_id'] = auth()->id() ?? 1;
 
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('products', 'public');
-            $data['image_url'] = $path;
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $filename = $file->hashName();
+                $file->move(public_path('images'), $filename);
+                $data['image_url'] = $filename;
+            }
+
+            $product = $this->productService->create($data);
+
+            $product->load('categories');
+
+            return view('admin.partials.row', compact('product'));
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error($e);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
-        $product = $this->productService->create($data);
-
-        if($request->has('categories')){
-            $product->categories()->attach($request->categories);
-        }
-
-        $product->load('categories');
-
-        return view('admin.partials.row', compact('product'));
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
             'name' => 'required',
-            'image' => 'nullable|image|max:2048',
+            'image' => 'nullable|image|max:4096',
             'price' => 'required|numeric',
             'categories' => 'required|array',
             'categories.*' => 'exists:categories,id'
@@ -72,12 +76,20 @@ class ProductController extends Controller {private $productService;
         $data = $request->all();
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('products', 'public');
-            $data['image_url'] = $path;
+            $file = $request->file('image');
+            $filename = $file->hashName();
+            $file->move(public_path('images'), $filename);
+            $data['image_url'] = $filename;
         }
 
         $product = $this->productService->update($id, $data);
 
         return view('admin.partials.row', compact('product'));
+    }
+
+    public function destroy($id)
+    {
+        $this->productService->delete($id);
+        return response()->json(['success' => true]);
     }
 }

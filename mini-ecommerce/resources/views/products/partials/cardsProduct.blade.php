@@ -4,7 +4,7 @@
         @foreach($products as $product)
         <div class="group flex flex-col h-full bg-white border border-gray-200 rounded-2xl p-4 transition-all hover:shadow-lg">
             
-            <div class="relative aspect-square overflow-hidden rounded-xl">
+            <div class="relative aspect-[4/3] overflow-hidden rounded-xl">
                 <img class="size-full object-cover transition-transform duration-500 group-hover:scale-105" 
                      src="{{ asset('images/' . $product->image_url) }}" 
                      alt="{{ $product->name }}">

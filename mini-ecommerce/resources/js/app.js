@@ -2,9 +2,7 @@ import './bootstrap';
 import 'preline'
 import { createIcons, icons } from "lucide";
 
-document.addEventListener("DOMContentLoaded", function () {
-    lucide.createIcons();
-});
+
 
 // --- Lucide Icons ---
 const initLucide = () => {

@@ -1,15 +1,15 @@
 <div id="hs-danger-alert" class="hs-overlay hidden size-full fixed top-0 start-0 z-80 overflow-x-hidden overflow-y-auto" role="dialog" tabindex="-1" aria-labelledby="hs-danger-alert-label">
   
-  <div class="hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all md:max-w-2xl md:w-full m-3 md:mx-auto">
+  <div class="hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all md:max-w-4xl md:w-full m-3 md:mx-auto">
     
     <div class="relative flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl overflow-hidden">
        <div class="text-end p-5">
          <button type="button" class="py-2 px-3 max-w-[50px] inline-lex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-50" data-hs-overlay="#hs-danger-alert">
-          X
+          <i data-lucide="x" class="w-4"></i>  
         </button>
        </div>
       <!-- Card Section -->
-      <div class="w-full px-4 py-10 sm:px-6 lg:px-8  mx-auto">
+      <div class="w-full px-3 sm:px-6 lg:px-6  mx-auto">
         <form id="productForm" data-store-url="{{ route('products.store') }}">
           @csrf
           <input type="hidden" name="_method" id="methodField" value="POST">
@@ -18,12 +18,21 @@
           <div class="bg-white rounded-xl shadow-xs">
             <div class="pt-0 p-4 sm:pt-0 sm:p-7">
               <div class="space-y-4 sm:space-y-6">
-                <div class="space-y-2">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="space-y-2">
                   <label for="af-submit-app-project-name" class="inline-block text-sm font-medium text-gray-800 mt-2.5">
                     Product name
                   </label>
 
-                  <input id="productName" type="text" name="name" class="py-1.5 sm:py-2 px-3 pe-11 block w-full border-gray-200 shadow-2xs rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" placeholder="Enter product name">
+                  <input id="productName" type="text" name="name" class="py-1.5 sm:py-2 px-3 pe-11 block w-full border border-gray-200 shadow-2xs rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" placeholder="Enter product name">
+                </div>
+                <div class="space-y-2">
+                  <label for="af-submit-app-price" class="inline-block text-sm font-medium text-gray-800 mt-2.5">
+                    Price
+                  </label>
+
+                  <input id="productPrice" type="number" step="0.01" name="price" class="py-1.5 sm:py-2 px-3 pe-11 block w-full border border-gray-200 shadow-2xs rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" placeholder="Enter price">
+                </div>
                 </div>
 
         
@@ -46,27 +55,33 @@
                       Maximum file size is 2 MB
                     </span>
                   </label>
+                  
+                  <div class="mt-4 hidden" id="previewContainer">
+                      <p class="text-sm text-gray-500 mb-2">Aperçu :</p>
+                      <img id="imagePreview" src="" alt="Preview" class="w-full h-48 object-cover rounded-lg border border-gray-200">
+                  </div>
                 </div>
-                <div class="space-y-2">
-                  <label for="af-submit-app-price" class="inline-block text-sm font-medium text-gray-800 mt-2.5">
-                    Price
-                  </label>
 
-                  <input id="productPrice" type="text" name="price" class="py-1.5 sm:py-2 px-3 pe-11 block w-full border-gray-200 shadow-2xs rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" placeholder="Enter price">
-                </div>
 
                 <div class="space-y-2">
                   <label class="inline-block text-sm font-medium text-gray-800 mt-2.5">
                     Select Categories
                   </label>
-                  <div class="grid grid-cols-2 gap-2 mt-2">
+                  
+                  <select id="categorySelect" name="categories[]" multiple data-hs-select='{
+                    "placeholder": "Select categories...",
+                    "toggleTag": "<button type=\"button\" aria-expanded=\"false\"></button>",
+                    "toggleClasses": "hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative py-3 ps-4 pe-9 flex items-center gap-x-2 text-nowrap w-full cursor-pointer bg-white border border-gray-200 rounded-lg text-start text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500",
+                    "dropdownClasses": "mt-2 z-50 w-full max-h-72 p-1 space-y-0.5 bg-white border border-gray-200 rounded-lg overflow-hidden overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 shadow-md",
+                    "optionClasses": "py-2 px-4 w-full text-sm text-gray-800 cursor-pointer hover:bg-gray-100 rounded-lg focus:outline-hidden focus:bg-gray-100",
+                    "optionTemplate": "<div class=\"flex justify-between items-center w-full\"><span data-title></span><span class=\"hidden hs-selected:block\"><svg class=\"shrink-0 size-3.5 text-blue-600 \" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"20 6 9 17 4 12\"/></svg></span></div>",
+                    "extraMarkup": "<div class=\"absolute top-1/2 end-3 -translate-y-1/2\"><svg class=\"shrink-0 size-3.5 text-gray-500 \" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m7 15 5 5 5-5\"/><path d=\"m7 9 5-5 5 5\"/></svg></div>"
+                  }' class="hidden">
+                    <option value="">Choose</option>
                     @foreach($categories as $category)
-                    <div class="flex">
-                        <input type="checkbox" name="categories[]" value="{{ $category->id }}" class="shrink-0 mt-0.5 border-gray-200 rounded text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" id="cat-{{ $category->id }}">
-                        <label for="cat-{{ $category->id }}" class="text-sm text-gray-500 ms-3">{{ $category->label }}</label>
-                    </div>
+                        <option value="{{ $category->id }}">{{ $category->label }}</option>
                     @endforeach
-                  </div>
+                  </select>
                 </div>
 
              
@@ -76,7 +91,7 @@
                     Description
                   </label>
 
-                  <textarea id="productDescription" name="description" class="py-1.5 sm:py-2 px-3 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" rows="6" placeholder="A detailed summary..."></textarea>
+                  <textarea id="productDescription" name="description" class="py-1.5 sm:py-2 px-3 block w-full border border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" rows="6" placeholder="A detailed summary..."></textarea>
                 </div>
               </div>
               <!-- End Grid -->

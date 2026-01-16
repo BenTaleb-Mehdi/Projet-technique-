@@ -11,7 +11,7 @@
     <div class="grid md:grid-cols-2 gap-12 lg:gap-20 items-start">
         
         <div class="relative">
-            <div class="aspect-square overflow-hidden rounded-3xl bg-gray-50 border border-gray-200 shadow-sm">
+            <div class="aspect-[4/3] overflow-hidden rounded-3xl bg-gray-50 border border-gray-200 shadow-sm">
                 <img class="size-full object-cover" 
                      src="{{ asset('images/' . $product->image_url) }}" 
                      alt="{{ $product->name }}">

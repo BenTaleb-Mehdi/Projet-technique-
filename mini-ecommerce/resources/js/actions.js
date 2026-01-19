@@ -1,267 +1,125 @@
-// --- VARIABLES GLOBALES ---
-let mode = 'create'; // 'create' or 'edit'
-let currentProductId = null;
-let timer;
+// --- 1. VARIABLES & ELEMENTS ---
+let mode = "create";
+let currentId = null;
+let searchTimeout;
 
-// DOM Elements
 const form = document.getElementById("productForm");
-const productBody = document.getElementById("product-table-body");
+const tableBody = document.getElementById("product-table-body");
 const submitBtn = document.getElementById("submitBtn");
-const methodField = document.getElementById("methodField");
 const searchInput = document.getElementById("productSearch");
 const categoryFilter = document.getElementById("categoryFilter");
 const imageInput = document.getElementById("af-submit-app-upload-images");
-const modalOverlay = document.getElementById("hs-danger-alert");
+const imagePreview = document.getElementById("imagePreview");
+const previewContainer = document.getElementById("previewContainer");
 
-// --- 1. GESTION DU SUBMIT (Routeur) ---
+// --- 2. MAIN FORM SUBMIT ---
 if (form) {
-    form.addEventListener("submit", function(e) {
+    form.addEventListener("submit", function (e) {
         e.preventDefault();
-
-        // Disable button to prevent double-submit
         submitBtn.disabled = true;
 
         const formData = new FormData(form);
 
-        if (mode === 'create') {
-            insertProduct(formData);
-        } else {
-            updateProduct(currentProductId, formData);
+        // Decide URL and Method based on mode
+        let url = form.dataset.storeUrl;
+        let method = "POST";
+
+        if (mode === "edit") {
+            url = `/admin/products/${currentId}`;
+            formData.append("_method", "PUT"); // Laravel trick
         }
+
+        saveProduct(url, method, formData);
     });
 }
 
-// --- 2. FONCTIONS CRUD ---
-
-// Insert Product (POST)
-// Insert Product (POST)
-async function insertProduct(formData) {
-    const url = form.dataset.storeUrl;
-    console.log("Adding Product to URL:", url);
-    console.log("Data:", Object.fromEntries(formData)); // Debug info
-
+// --- 3. SAVE FUNCTION (Create & Edit) ---
+async function saveProduct(url, method, formData) {
     try {
         const response = await fetch(url, {
-            method: "POST",
+            method: "POST", // Always POST for FormData (Laravel handles PUT via _method)
             headers: {
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                "X-CSRF-TOKEN": document.querySelector(
+                    'meta[name="csrf-token"]',
+                ).content,
                 "X-Requested-With": "XMLHttpRequest",
                 Accept: "text/html",
             },
             body: formData,
         });
 
-        console.log("Response Status:", response.status);
-        await handleResponse(response, 'create');
-    } catch (error) {
-        console.error("Insert Error:", error);
-        alert("Erreur JS lors de l'ajout (voir console).");
-    } finally {
-        submitBtn.disabled = false;
-    }
-}
+        if (response.ok) {
+            const html = await response.text();
 
-// Update Product (PUT/POST logic)
-async function updateProduct(id, formData) {
-    const url = `/admin/products/${id}`;
+            if (mode === "edit") {
+                document.getElementById(`row-${currentId}`).outerHTML = html;
+                alert("Produit modifié !");
+            } else {
+                tableBody.insertAdjacentHTML("afterbegin", html);
+                alert("Produit ajouté !");
+            }
 
-    try {
-        const response = await fetch(url, {
-            method: "POST", // Laravel spoofing used via _method field
-            headers: {
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
-                "X-Requested-With": "XMLHttpRequest",
-                Accept: "text/html",
-            },
-            body: formData,
-        });
-
-        await handleResponse(response, 'update');
-    } catch (error) {
-        console.error("Update Error:", error);
-    } finally {
-        submitBtn.disabled = false;
-    }
-}
-
-// Shared Response Handler
-async function handleResponse(response, action) {
-    if (response.ok) {
-        const htmlRow = await response.text();
-
-        if (action === 'update') {
-            document.getElementById(`row-${currentProductId}`).outerHTML = htmlRow;
-            alert("Produit modifié avec succès !");
+            closeModalAndReset();
         } else {
-            productBody.insertAdjacentHTML("afterbegin", htmlRow);
-             alert("Produit ajouté avec succès !");
+            handleError(response);
         }
-
-        resetForm();
-        
-        if (window.HSOverlay) HSOverlay.close(modalOverlay);
-        if (window.createLucideIcons) window.createLucideIcons();
-    } else {
-        handleError(response);
+    } catch (error) {
+        console.error(error);
+        alert("Une erreur est survenue.");
+    } finally {
+        submitBtn.disabled = false;
     }
 }
 
-// Error Handler
-async function handleError(response) {
-    console.error("Server Error:", response.status, response.statusText);
-    
-    if (response.status === 422) {
-        const data = await response.json();
-        let messages = "Erreur de validation:\n";
-        for (const [key, errors] of Object.entries(data.errors)) {
-            messages += `- ${errors.join(', ')}\n`;
-        }
-        alert(messages);
-    } else {
-        const errorText = await response.text();
-        console.error("Response Body:", errorText);
-        alert(`Une erreur est survenue (${response.status}). Vérifiez la console.`);
-    }
-}
-
-// --- 3. GESTION DE L'INTERFACE (Reset / Prepare) ---
-
-// Reset Form (pour Create)
-function resetForm() {
-    form.reset();
-    mode = 'create';
-    currentProductId = null;
-    methodField.value = "POST";
-    submitBtn.innerText = "Ajouter";
-
-    // Reset Image Preview
-    const previewContainer = document.getElementById("previewContainer");
-    const imagePreview = document.getElementById("imagePreview");
-    if (previewContainer && imagePreview) {
-        imagePreview.src = "";
-        previewContainer.classList.add("hidden");
-    }
-
-    // Reset Select
-    resetCategorySelect([]);
-}
-
-// Prepare Edit (pour Update)
-function prepareEdit(product) {
-    resetForm(); // Clean inputs first
-    
-    mode = 'edit';
-    currentProductId = product.id;
-    methodField.value = "PUT";
-    submitBtn.innerText = "Modifier";
-
-    // Fill Inputs
-    document.getElementById("productName").value = product.name;
-    document.getElementById("productPrice").value = product.price;
-    document.getElementById("productDescription").value = product.description;
-
-    // Fill Image Preview
-    if (product.image_url) {
-        const previewContainer = document.getElementById("previewContainer");
-        const imagePreview = document.getElementById("imagePreview");
-        if (previewContainer && imagePreview) {
-            imagePreview.src = `/images/${product.image_url}`;
-            previewContainer.classList.remove("hidden");
-        }
-    }
-
-    // Fill Categories
-    if (product.categories) {
-        const categoryIds = product.categories.map(c => c.id);
-        resetCategorySelect(categoryIds);
-    }
-}
-
-function resetCategorySelect(selectedIds = []) {
-    const select = document.getElementById("categorySelect");
-    if (!select) return;
-
-    Array.from(select.options).forEach(opt => {
-        opt.selected = selectedIds.includes(parseInt(opt.value));
-    });
-
-    if (window.HSSelect) {
-        const instance = HSSelect.getInstance(select);
-        if (instance) instance.destroy();
-        new HSSelect(select);
-    } else {
-        select.dispatchEvent(new Event('change', { bubbles: true }));
-    }
-}
-
-
-// --- 4. EXPOSED FUNCTIONS (Global Access) ---
-
-window.openCreateModal = function() {
-    resetForm();
-    // Modal is opened via HTML data attributes, no JS needed for open
-};
-
-window.editProduct = function(product) {
-    prepareEdit(product);
-};
-
-window.deleteProduct = async function(id) {
-    if (!confirm("Êtes-vous sûr de vouloir supprimer ce produit ?")) return;
+// --- 4. DELETE FUNCTION ---
+window.deleteProduct = async function (id) {
+    if (!confirm("Supprimer ce produit ?")) return;
 
     try {
         const response = await fetch(`/admin/products/${id}`, {
             method: "DELETE",
             headers: {
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
-                "Content-Type": "application/json",
-                "X-Requested-With": "XMLHttpRequest"
-            }
+                "X-CSRF-TOKEN": document.querySelector(
+                    'meta[name="csrf-token"]',
+                ).content,
+                "X-Requested-With": "XMLHttpRequest",
+            },
         });
 
         if (response.ok) {
             const row = document.getElementById(`row-${id}`);
             if (row) row.remove();
-            if (window.createLucideIcons) window.createLucideIcons();
-             alert("Produit supprimé !");
+            alert("Produit supprimé !");
         } else {
             alert("Erreur lors de la suppression.");
         }
     } catch (error) {
         console.error(error);
-        alert("Une erreur est survenue.");
     }
 };
 
 // --- 5. SEARCH & FILTER ---
+function fetchProducts() {
+    const url = searchInput.dataset.url || "/admin";
+    const search = searchInput.value;
+    const category = categoryFilter.value;
 
-async function fetchProducts() {
-    const search = searchInput ? searchInput.value : '';
-    const categoryId = categoryFilter ? categoryFilter.value : '';
-    const url = searchInput ? searchInput.dataset.url : '/admin';
+    // Build URL: /admin?search=abc&category_id=1
+    const finalUrl = `${url}?search=${search}&category_id=${category}`;
 
-    const params = new URLSearchParams();
-    if (search) params.append('search', search);
-    if (categoryId) params.append('category_id', categoryId);
-
-    try {
-        const response = await fetch(`${url}?${params.toString()}`, {
-            headers: { "X-Requested-With": "XMLHttpRequest" }
-        });
-
-        if (response.ok) {
-            productBody.innerHTML = await response.text();
+    fetch(finalUrl, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+        .then((response) => response.text())
+        .then((html) => {
+            tableBody.innerHTML = html;
+            // Reload icons if needed
             if (window.createLucideIcons) window.createLucideIcons();
-        }
-    } catch (error) {
-        console.error("Filter Error:", error);
-    }
+        });
 }
 
 if (searchInput) {
-    searchInput.addEventListener("input", (e) => {
-        clearTimeout(timer);
-        timer = setTimeout(fetchProducts, 300);
+    searchInput.addEventListener("input", function () {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(fetchProducts, 300);
     });
 }
 
@@ -269,30 +127,111 @@ if (categoryFilter) {
     categoryFilter.addEventListener("change", fetchProducts);
 }
 
-// --- 6. UTILS (Image Preview, Modal Close) ---
+window.resetCategoryFilter = function () {
+    const select = document.getElementById("categoryFilter");
+    if (!select) return;
 
+    // 1. Reje3 l-valeur l khawa (vaut "")
+    select.value = "";
+
+    // 2. Ila knti khdam b Preline HSSelect, khassna n-updatew l-interface
+    if (window.HSSelect) {
+        const instance = HSSelect.getInstance(select);
+        if (instance) {
+            // Reje3 selection l-placeholder
+            instance.setValue("");
+        }
+    }
+
+    // 3. Dir l-appel l fetchProducts bach y-reje3 lina ga3 l-produits
+    fetchProducts();
+};
+// --- 6. UTILITIES & UI ---
+
+// Reset Form (Create Mode)
+window.openCreateModal = function () {
+    form.reset();
+    mode = "create";
+    currentId = null;
+    submitBtn.innerText = "Ajouter";
+    hidePreview();
+    resetCategorySelect([]);
+};
+
+// Fill Form (Edit Mode)
+window.editProduct = function (product) {
+    form.reset();
+    mode = "edit";
+    currentId = product.id;
+    submitBtn.innerText = "Modifier";
+
+    // Simple value assignment
+    document.getElementById("productName").value = product.name;
+    document.getElementById("productPrice").value = product.price;
+    document.getElementById("productDescription").value = product.description;
+
+    // Handle Image
+    if (product.image_url) {
+        imagePreview.src = `/images/${product.image_url}`;
+        previewContainer.classList.remove("hidden");
+    } else {
+        hidePreview();
+    }
+
+    // Handle Categories
+    const ids = product.categories.map(function (c) {
+        return c.id;
+    });
+    resetCategorySelect(ids);
+};
+
+function closeModalAndReset() {
+    window.openCreateModal(); // Resets vars
+    const modal = document.getElementById("hs-danger-alert");
+    if (window.HSOverlay) HSOverlay.close(modal);
+    if (window.createLucideIcons) window.createLucideIcons();
+}
+
+function hidePreview() {
+    imagePreview.src = "";
+    previewContainer.classList.add("hidden");
+}
+
+function handleError(response) {
+    if (response.status === 422) {
+        response.json().then((data) => {
+            alert("Erreur de validation. Vérifiez les champs.");
+        });
+    } else {
+        alert("Erreur serveur : " + response.status);
+    }
+}
+
+// Image Preview Listener
 if (imageInput) {
-    imageInput.addEventListener("change", function(e) {
+    imageInput.addEventListener("change", function (e) {
         const file = e.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const previewContainer = document.getElementById("previewContainer");
-                const imagePreview = document.getElementById("imagePreview");
-                if (previewContainer && imagePreview) {
-                    imagePreview.src = e.target.result;
-                    previewContainer.classList.remove("hidden");
-                }
-            }
-            reader.readAsDataURL(file);
+            imagePreview.src = URL.createObjectURL(file);
+            previewContainer.classList.remove("hidden");
         }
     });
 }
 
-if (modalOverlay) {
-    modalOverlay.addEventListener("click", function(e) {
-        if (e.target === this) {
-            if (window.HSOverlay) HSOverlay.close(this);
-        }
-    });
+// Helper to handle the UI Library Select
+function resetCategorySelect(ids) {
+    const select = document.getElementById("categorySelect");
+    if (!select) return;
+
+    for (let i = 0; i < select.options.length; i++) {
+        const option = select.options[i];
+        option.selected = ids.includes(parseInt(option.value));
+    }
+
+    // Refresh UI Library (Preline UI)
+    if (window.HSSelect) {
+        const instance = HSSelect.getInstance(select);
+        if (instance) instance.destroy();
+        new HSSelect(select);
+    }
 }

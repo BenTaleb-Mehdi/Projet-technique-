@@ -23,8 +23,7 @@ class HomeController extends Controller
     public function show($id)
     {
         $product = $this->productService->find($id);
-        
-        // Make sure this path points to your full detail page
+    
         return view('products.show', compact('product'));
     }
 }

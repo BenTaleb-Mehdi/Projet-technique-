@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreProductRequest;
+use App\Http\Requests\Admin\UpdateProductRequest;
 use App\Services\CategoryService;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
@@ -29,18 +31,12 @@ class ProductController extends Controller {private $productService;
         return view('admin.partials.index', compact('products', 'categories'));
     }
 
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'image' => 'nullable|image|max:2048',
-            'price' => 'required|numeric',
-            'categories' => 'required|array',
-            'categories.*' => 'exists:categories,id'
-        ]);
+        
 
         try {
-            $data = $request->all();
+            $data = $request->validated();
 
             $data['user_id'] = auth()->id() ?? 1;
 
@@ -58,22 +54,13 @@ class ProductController extends Controller {private $productService;
             return view('admin.partials.row', compact('product'));
 
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error($e);
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateProductRequest $request, $id)
     {
-        $request->validate([
-            'name' => 'required',
-            'image' => 'nullable|image|max:4096',
-            'price' => 'required|numeric',
-            'categories' => 'required|array',
-            'categories.*' => 'exists:categories,id'
-        ]);
-
-        $data = $request->all();
+        $data = $request->validated();
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');

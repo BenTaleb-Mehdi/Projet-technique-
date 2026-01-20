@@ -19,11 +19,13 @@
         </div>
 
         <div class="flex flex-col">
-            @if($product->category_label)
-                <span class="mb-3 inline-block px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-bold uppercase tracking-widest">
-                    {{ $product->category_label }}
-                </span>
-            @endif
+           <div class="flex flex-wrap gap-2 mb-2">
+                    @foreach($product->categories as $category)
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-gary-600 bg-blue-50 px-2 py-0.5 rounded-md">
+                        {{ $category->label ?? 'General' }}
+                    </span>
+                    @endforeach
+            </div>
 
             <h1 class="text-4xl font-extrabold text-gray-900 sm:text-5xl tracking-tight">
                 {{ $product->name }}

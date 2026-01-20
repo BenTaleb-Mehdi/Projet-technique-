@@ -1,3 +1,4 @@
+import { showAlert } from './alearts';
 // --- 1. VARIABLES & ELEMENTS ---
 let mode = "create";
 let currentId = null;
@@ -53,10 +54,10 @@ async function saveProduct(url, method, formData) {
 
             if (mode === "edit") {
                 document.getElementById(`row-${currentId}`).outerHTML = html;
-                alert("Produit modifié !");
+                showAlert("Product is Updated");
             } else {
                 tableBody.insertAdjacentHTML("afterbegin", html);
-                alert("Produit ajouté !");
+                showAlert("Product is added");
             }
 
             closeModalAndReset();
@@ -65,7 +66,7 @@ async function saveProduct(url, method, formData) {
         }
     } catch (error) {
         console.error(error);
-        alert("Une erreur est survenue.");
+        showAlert("Une erreur est survenue.", "error");
     } finally {
         submitBtn.disabled = false;
     }
@@ -89,9 +90,9 @@ window.deleteProduct = async function (id) {
         if (response.ok) {
             const row = document.getElementById(`row-${id}`);
             if (row) row.remove();
-            alert("Produit supprimé !");
+            showAlert("Product is Deleted");
         } else {
-            alert("Erreur lors de la suppression.");
+           showAlert("Product is added", "error");
         }
     } catch (error) {
         console.error(error);
@@ -107,7 +108,9 @@ function fetchProducts() {
     // Build URL: /admin?search=abc&category_id=1
     const finalUrl = `${url}?search=${search}&category_id=${category}`;
 
-    fetch(finalUrl, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+    fetch(finalUrl, {
+         headers: { "X-Requested-With": "XMLHttpRequest" } 
+        })
         .then((response) => response.text())
         .then((html) => {
             tableBody.innerHTML = html;

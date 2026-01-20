@@ -1,4 +1,18 @@
 import { showAlert } from './alearts';
+// Translations
+ window.translations = {
+               product_updated: "{{ __('actions.product_updated') }}",
+               product_added: "{{ __('actions.product_added') }}",
+               product_deleted: "{{ __('actions.product_deleted') }}",
+               confirm_delete: "{{ __('actions.confirm_delete') }}",
+               error_occurred: "{{ __('actions.error_occurred') }}",
+               validation_error: "{{ __('actions.validation_error') }}",
+               server_error: "{{ __('actions.server_error') }}",
+               add: "{{ __('actions.add') }}",
+               edit: "{{ __('actions.edit') }}",
+           };
+
+
 // --- 1. VARIABLES & ELEMENTS ---
 let mode = "create";
 let currentId = null;

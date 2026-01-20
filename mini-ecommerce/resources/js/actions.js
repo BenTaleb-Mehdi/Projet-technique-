@@ -54,10 +54,10 @@ async function saveProduct(url, method, formData) {
 
             if (mode === "edit") {
                 document.getElementById(`row-${currentId}`).outerHTML = html;
-                showAlert("Product is Updated");
+                showAlert(window.translations.product_updated);
             } else {
                 tableBody.insertAdjacentHTML("afterbegin", html);
-                showAlert("Product is added");
+                showAlert(window.translations.product_added);
             }
 
             closeModalAndReset();
@@ -66,7 +66,7 @@ async function saveProduct(url, method, formData) {
         }
     } catch (error) {
         console.error(error);
-        showAlert("Une erreur est survenue.", "error");
+        showAlert(window.translations.error_occurred, "error");
     } finally {
         submitBtn.disabled = false;
     }
@@ -74,7 +74,7 @@ async function saveProduct(url, method, formData) {
 
 // --- 4. DELETE FUNCTION ---
 window.deleteProduct = async function (id) {
-    if (!confirm("Supprimer ce produit ?")) return;
+    if (!confirm(window.translations.confirm_delete)) return;
 
     try {
         const response = await fetch(`/admin/products/${id}`, {
@@ -88,11 +88,10 @@ window.deleteProduct = async function (id) {
         });
 
         if (response.ok) {
-            const row = document.getElementById(`row-${id}`);
             if (row) row.remove();
-            showAlert("Product is Deleted");
+            showAlert(window.translations.product_deleted);
         } else {
-           showAlert("Product is added", "error");
+           showAlert(window.translations.error_occurred, "error");
         }
     } catch (error) {
         console.error(error);
@@ -156,7 +155,7 @@ window.openCreateModal = function () {
     form.reset();
     mode = "create";
     currentId = null;
-    submitBtn.innerText = "Ajouter";
+    submitBtn.innerText = window.translations.add;
     hidePreview();
     resetCategorySelect([]);
 };
@@ -166,7 +165,7 @@ window.editProduct = function (product) {
     form.reset();
     mode = "edit";
     currentId = product.id;
-    submitBtn.innerText = "Modifier";
+    submitBtn.innerText = window.translations.edit;
 
     // Simple value assignment
     document.getElementById("productName").value = product.name;
@@ -203,10 +202,10 @@ function hidePreview() {
 function handleError(response) {
     if (response.status === 422) {
         response.json().then((data) => {
-            alert("Erreur de validation. Vérifiez les champs.");
+            alert(window.translations.validation_error);
         });
     } else {
-        alert("Erreur serveur : " + response.status);
+        alert(window.translations.server_error + " " + response.status);
     }
 }
 

@@ -14,18 +14,18 @@
                 
                 <div class="flex flex-wrap gap-2 mb-2">
                     @foreach($product->categories as $category)
-                    <span class="text-[10px] font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
-                        {{ $category->label ?? 'General' }}
-                    </span>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-gary-600 bg-blue-50 px-2 py-0.5 rounded-md">
+                   {{ $category->label ?? __('views.general_category') }}
+                </span>
                     @endforeach
                 </div>
 
-                <h3 class="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors leading-tight">
-                    {{ $product->name }}
+                <h3 class="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors leading-tight mb-2">
+                   <a href="{{ route('products.show', $product->id) }}"> {{ $product->name }}</a>
                 </h3>
 
-                <p class="mt-2 text-gray-500 text-sm line-clamp-2">
-                    {{ $product->description ?? 'No description available.' }}
+                <p class="text-sm text-gray-600 mb-4 line-clamp-3">
+                    {{ $product->description ?? __('views.no_description') }}
                 </p>
 
                 <div class="mt-auto pt-3">
@@ -36,11 +36,9 @@
             </div>
 
             <div class="mt-5">
-                <a href="{{ route('products.show', $product->id) }}" 
-                   class="py-3 px-4 w-full inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-xl border border-transparent bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:bg-blue-600 transition-all">
-                    View Product
-                    <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                </a>
+                <a href="{{ route('products.show', $product->id) }}" class="flex-1 bg-blue-600 text-white text-xs font-bold uppercase tracking-widest py-3 px-4 rounded-md hover:bg-blue-700 transition-colors text-center flex items-center justify-center gap-2">
+                {{ __('actions.view_product') }} <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
             </div>
             
         </div>

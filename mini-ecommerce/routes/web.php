@@ -16,7 +16,12 @@ Route::post('/admin/products/store', [ProductController::class, 'store'])->name(
 Route::put('/admin/products/{product}', [ProductController::class, 'update'])->name('products.update');
 Route::delete('/admin/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 
-  
+  Route::get('lang/{locale}', function ($locale) {
+    if (in_array($locale, ['en', 'fr'])) {
+        session()->put('locale', $locale);
+    }
+    return redirect()->back();
+})->name('lang.switch');
 
 
 

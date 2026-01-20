@@ -26,15 +26,12 @@ class ProductController extends Controller {private $productService;
         
         if ($request->ajax()) {
             return view('admin.partials.rows', compact('products'));
-        }
-        
+        }    
         return view('admin.partials.index', compact('products', 'categories'));
     }
 
     public function store(StoreProductRequest $request)
     {
-        
-
         try {
             $data = $request->validated();
 

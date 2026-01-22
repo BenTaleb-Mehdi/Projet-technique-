@@ -129,14 +129,14 @@ Projet-technique-/
 ```mermaid
 graph TB
     A["🏠 Projet-technique-"]
-    
+
     A --> B["<b>mini-ecommerce</b><br/>(Main Project)"]
     A --> C["prototype"]
     A --> D["prototype_livecoding"]
     A --> E["conception"]
     A --> F["doc"]
     A --> G["fonctionalite"]
-    
+
     B --> B1["<b>app</b><br/>Application Logic"]
     B --> B2["<b>config</b><br/>Configuration"]
     B --> B3["<b>database</b><br/>Migrations & Seeds"]
@@ -147,23 +147,23 @@ graph TB
     B --> B8["<b>Agent</b><br/>Custom Agents"]
     B --> B9["<b>bootstrap</b><br/>Bootstrap"]
     B --> B10["<b>public</b><br/>Public Assets"]
-    
+
     B1 --> B1a["Http/"]
     B1 --> B1b["Models/"]
     B1 --> B1c["Services/"]
     B1 --> B1d["Providers/"]
-    
+
     B4 --> B4a["views/"]
     B4 --> B4b["css/"]
     B4 --> B4c["js/"]
-    
+
     B3 --> B3a["migrations/"]
     B3 --> B3b["seeders/"]
     B3 --> B3c["factories/"]
-    
+
     B6 --> B6a["Feature/"]
     B6 --> B6b["Unit/"]
-    
+
     style A fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px,color:#fff
     style B fill:#4ecdc4,stroke:#0b7285,stroke-width:2px,color:#fff
     style C fill:#95a5a6,stroke:#34495e,stroke-width:1px,color:#fff
@@ -171,7 +171,7 @@ graph TB
     style E fill:#f39c12,stroke:#d68910,stroke-width:1px,color:#fff
     style F fill:#f39c12,stroke:#d68910,stroke-width:1px,color:#fff
     style G fill:#f39c12,stroke:#d68910,stroke-width:1px,color:#fff
-    
+
     style B1 fill:#3498db,stroke:#2c3e50,stroke-width:1px,color:#fff
     style B2 fill:#9b59b6,stroke:#6c3483,stroke-width:1px,color:#fff
     style B3 fill:#e74c3c,stroke:#c0392b,stroke-width:1px,color:#fff
@@ -182,41 +182,41 @@ graph TB
     style B8 fill:#c0392b,stroke:#a93226,stroke-width:1px,color:#fff
     style B9 fill:#34495e,stroke:#2c3e50,stroke-width:1px,color:#fff
     style B10 fill:#5d6d7b,stroke:#34495e,stroke-width:1px,color:#fff
-    
+
     style B1a fill:#3498db,stroke:#2c3e50,stroke-width:1px,color:#fff
     style B1b fill:#3498db,stroke:#2c3e50,stroke-width:1px,color:#fff
     style B1c fill:#3498db,stroke:#2c3e50,stroke-width:1px,color:#fff
     style B1d fill:#3498db,stroke:#2c3e50,stroke-width:1px,color:#fff
-    
+
     style B4a fill:#2ecc71,stroke:#27ae60,stroke-width:1px,color:#fff
     style B4b fill:#2ecc71,stroke:#27ae60,stroke-width:1px,color:#fff
     style B4c fill:#2ecc71,stroke:#27ae60,stroke-width:1px,color:#fff
-    
+
     style B3a fill:#e74c3c,stroke:#c0392b,stroke-width:1px,color:#fff
     style B3b fill:#e74c3c,stroke:#c0392b,stroke-width:1px,color:#fff
     style B3c fill:#e74c3c,stroke:#c0392b,stroke-width:1px,color:#fff
-    
+
     style B6a fill:#1abc9c,stroke:#16a085,stroke-width:1px,color:#fff
     style B6b fill:#1abc9c,stroke:#16a085,stroke-width:1px,color:#fff
 ```
 
 ### 🎨 Color Legend
 
-| Color | Category |
-|-------|----------|
-| 🔴 Red | Main Project Root |
-| 🔵 Teal | Main Application |
-| 🔴 Blue | Application Logic (HTTP, Models, Services) |
-| 🟣 Purple | Configuration |
-| 🔴 Red | Database (Migrations, Seeds) |
-| 🟢 Green | Frontend Resources (Views, CSS, JS) |
-| 🟡 Yellow | Routes & Web |
-| 🔵 Teal | Tests (Unit, Feature) |
-| 🟠 Orange | Storage (Logs, Cache) |
-| 🔴 Dark Red | Custom Agents |
-| ⚫ Dark | Bootstrap & Public |
-| 🟤 Gray | Backup/Prototypes |
-| 🟠 Orange | Documentation |
+| Color       | Category                                   |
+| ----------- | ------------------------------------------ |
+| 🔴 Red      | Main Project Root                          |
+| 🔵 Teal     | Main Application                           |
+| 🔴 Blue     | Application Logic (HTTP, Models, Services) |
+| 🟣 Purple   | Configuration                              |
+| 🔴 Red      | Database (Migrations, Seeds)               |
+| 🟢 Green    | Frontend Resources (Views, CSS, JS)        |
+| 🟡 Yellow   | Routes & Web                               |
+| 🔵 Teal     | Tests (Unit, Feature)                      |
+| 🟠 Orange   | Storage (Logs, Cache)                      |
+| 🔴 Dark Red | Custom Agents                              |
+| ⚫ Dark     | Bootstrap & Public                         |
+| 🟤 Gray     | Backup/Prototypes                          |
+| 🟠 Orange   | Documentation                              |
 
 ---
 
@@ -233,16 +233,15 @@ graph TB
 
 ## 📌 Key Directories
 
-| Directory | Purpose |
-|-----------|---------|
-| `mini-ecommerce/` | Main e-commerce application |
-| `prototype/` | Backup/prototype version |
-| `prototype_livecoding/` | Backup/livecoding version |
-| `app/` | Application core (Models, Controllers, Services) |
-| `config/` | Configuration files |
-| `database/` | Migrations, Factories, Seeders |
-| `resources/` | Frontend assets (Views, CSS, JS) |
-| `routes/` | Application routing |
-| `tests/` | Unit & Feature tests |
-| `Agent/` | Custom agent implementations |
-
+| Directory               | Purpose                                          |
+| ----------------------- | ------------------------------------------------ |
+| `mini-ecommerce/`       | Main e-commerce application                      |
+| `prototype/`            | Backup/prototype version                         |
+| `prototype_livecoding/` | Backup/livecoding version                        |
+| `app/`                  | Application core (Models, Controllers, Services) |
+| `config/`               | Configuration files                              |
+| `database/`             | Migrations, Factories, Seeders                   |
+| `resources/`            | Frontend assets (Views, CSS, JS)                 |
+| `routes/`               | Application routing                              |
+| `tests/`                | Unit & Feature tests                             |
+| `Agent/`                | Custom agent implementations                     |

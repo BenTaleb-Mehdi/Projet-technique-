@@ -6,10 +6,11 @@
     <title>{{ __('views.app_name') }}</title>
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
-       @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/actions.js'])
+       @vite(['resources/css/app.css', 'resources/js/actions.js', 'resources/js/app.js'])
        
 </head>
 <body>
+    <div id="admin-layout" x-data="productManager({ indexUrl: '{{ route('admin.partials.index') }}' })">
 
 
 @include('admin.partials.navbar')
@@ -18,5 +19,6 @@
     @yield('content')
 </div>
 
+</div>
 </body>
 </html>

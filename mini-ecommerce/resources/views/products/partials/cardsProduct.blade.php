@@ -48,7 +48,7 @@
     </div>
      <div class="w-full px-4 sm:px-6 lg:px-8 mx-auto pb-12">
         <div class="mt-8">
-            {{ $products->links() }}
+            {{ $products->links('vendor.pagination.custom') }}
         </div>
     </div>
 </div>

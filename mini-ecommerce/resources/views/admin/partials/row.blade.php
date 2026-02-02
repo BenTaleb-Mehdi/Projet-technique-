@@ -31,14 +31,14 @@
 
       <button type="button" 
               onclick='editProduct(@json($product))'
-              class="text-indigo-600 hover:text-indigo-900 font-semibold"
+              class="text-indigo-500 hover:text-indigo-900 font-semibold"
               data-hs-overlay="#hs-danger-alert">
-      <i data-lucide="pencil" class="w-5"></i>  
+      <i data-lucide="pencil" class="w-5 cursor-pointer"></i>  
       </button>
       <button type="button" 
               onclick="deleteProduct({{ $product->id }})"
-              class="text-red-600 hover:text-red-800 font-semibold">
-      <i data-lucide="octagon-x" class="w-5"></i>  
+              class="text-red-500 hover:text-red-800 font-semibold">
+      <i data-lucide="trash" class="w-5 cursor-pointer"></i>  
       </button>
     </div>
   </td>

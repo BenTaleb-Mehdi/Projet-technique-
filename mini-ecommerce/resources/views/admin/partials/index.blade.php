@@ -81,8 +81,8 @@
         </div>
 
         @if($products->hasPages())
-        <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
-            {{ $products->links() }}
+        <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end">
+            {{ $products->links('vendor.pagination.custom') }}
         </div>
         @endif
     </div>

@@ -10,7 +10,7 @@
        
 </head>
 <body>
-    <div id="admin-layout" x-data="productManager({ indexUrl: '{{ route('admin.partials.index') }}' })">
+    <div id="admin-layout" x-data="productManager(window.adminConfig || {})">
 
 
 @include('admin.partials.navbar')

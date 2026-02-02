@@ -3,6 +3,8 @@ import { showAlert } from './alearts.js';
 document.addEventListener('alpine:init', () => {
     Alpine.data('productManager', (config = {}) => ({
         // --- 1. STATE ---
+        products: config.initialProducts || [],
+        paginationHtml: config.initialPagination || '',
         isProductModalOpen: false,
         isDeleteModalOpen: false,
         idToDelete: null,
@@ -14,14 +16,11 @@ document.addEventListener('alpine:init', () => {
         
         // --- 2. INIT ---
         init() {
-            // Watchers for reactive fetching (Search & Category)
             this.$watch('search', () => this.fetchProducts());
             this.$watch('category', () => this.fetchProducts());
             
-            // Initial Lucide Icons
             if (window.createLucideIcons) window.createLucideIcons();
 
-            // Sync with Preline HSSelect (Dynamic Select UI)
             this.$nextTick(() => {
                 const filterSelect = document.getElementById('categoryFilter');
                 if (filterSelect) {
@@ -39,13 +38,18 @@ document.addEventListener('alpine:init', () => {
             
             this.isLoading = true;
             fetch(finalUrl, {
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                headers: { 
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
             })
-            .then(response => response.text())
-            .then(html => {
-                const tableBody = document.getElementById('product-table-body');
-                if (tableBody) tableBody.innerHTML = html;
-                if (window.createLucideIcons) window.createLucideIcons();
+            .then(response => response.json())
+            .then(data => {
+                this.products = data.products;
+                this.paginationHtml = data.pagination;
+                this.$nextTick(() => {
+                    if (window.createLucideIcons) window.createLucideIcons();
+                });
             })
             .catch(err => console.error('Fetch products failed:', err))
             .finally(() => this.isLoading = false);
@@ -53,7 +57,6 @@ document.addEventListener('alpine:init', () => {
 
         // --- 4. CRUD OPERATIONS ---
 
-        // Open Create Modal
         openCreateModal() {
             this.mode = 'create';
             this.currentId = null;
@@ -74,7 +77,6 @@ document.addEventListener('alpine:init', () => {
             if (window.createLucideIcons) window.createLucideIcons();
         },
 
-        // Open Edit Modal
         editProduct(product) {
             this.mode = 'edit';
             this.currentId = product.id;
@@ -83,7 +85,6 @@ document.addEventListener('alpine:init', () => {
             const form = document.getElementById('productForm');
             if (form) form.reset();
 
-            // Populate Fields
             document.getElementById('productId').value = product.id;
             document.getElementById('productName').value = product.name;
             document.getElementById('productPrice').value = product.price;
@@ -92,7 +93,6 @@ document.addEventListener('alpine:init', () => {
             const submitBtn = document.getElementById('submitBtn');
             if (submitBtn && window.translations) submitBtn.innerText = window.translations.edit;
 
-            // Handle Image Preview
             const imagePreview = document.getElementById('imagePreview');
             const previewContainer = document.getElementById('previewContainer');
             if (product.image_url && imagePreview && previewContainer) {
@@ -102,14 +102,12 @@ document.addEventListener('alpine:init', () => {
                 this.hidePreview();
             }
 
-            // Handle Categories
             const selectedIds = product.categories.map(c => c.id);
             this.resetCategorySelect(selectedIds);
             
             if (window.createLucideIcons) window.createLucideIcons();
         },
 
-        // Save Product (Create/Update)
         async saveProduct(e) {
             const form = e.target;
             const submitBtn = form.querySelector('[type=\"submit\"]');
@@ -121,34 +119,38 @@ document.addEventListener('alpine:init', () => {
 
             if (this.mode === 'edit') {
                 url = `/admin/products/${this.currentId}`;
-                formData.append('_method', 'PUT'); // Laravel Method Spoofing
+                formData.append('_method', 'PUT');
             }
 
             try {
                 const response = await fetch(url, {
-                    method: 'POST', // Always POST for FormData uploads
+                    method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name=\"csrf-token\"]').content,
                         'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'text/html',
+                        'Accept': 'application/json',
                     },
                     body: formData,
                 });
 
                 if (response.ok) {
-                    const html = await response.text();
-                    const tableBody = document.getElementById('product-table-body');
+                    const product = await response.json();
 
                     if (this.mode === 'edit') {
-                        const row = document.getElementById(`row-${this.currentId}`);
-                        if (row) row.outerHTML = html;
+                        const index = this.products.findIndex(p => p.id === this.currentId);
+                        if (index !== -1) {
+                            this.products[index] = product;
+                        }
                         if (window.translations) showAlert(window.translations.product_updated);
                     } else {
-                        if (tableBody) tableBody.insertAdjacentHTML('afterbegin', html);
+                        this.products.unshift(product);
                         if (window.translations) showAlert(window.translations.product_added);
                     }
 
                     this.closeModalAndReset();
+                    this.$nextTick(() => {
+                        if (window.createLucideIcons) window.createLucideIcons();
+                    });
                 } else {
                     this.handleError(response);
                 }
@@ -160,7 +162,11 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        // Delete Product
+        confirmDelete(id) {
+            this.idToDelete = id;
+            this.isDeleteModalOpen = true;
+        },
+
         deleteProduct() {
             if (!this.idToDelete) return;
 
@@ -168,13 +174,13 @@ document.addEventListener('alpine:init', () => {
                 method: 'DELETE',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name=\"csrf-token\"]').content,
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
                 }
             })
             .then(response => {
                 if (response.ok) {
-                    const row = document.getElementById(`row-${this.idToDelete}`);
-                    if (row) row.remove();
+                    this.products = this.products.filter(p => p.id !== this.idToDelete);
                     if (window.showAlert) showAlert(window.translations.product_deleted);
                 } else {
                     if (window.showAlert) showAlert(window.translations.error_occurred, 'error');
@@ -186,13 +192,6 @@ document.addEventListener('alpine:init', () => {
             });
         },
 
-        // Confirm Delete (Open Modal)
-        confirmDelete(id) {
-            this.idToDelete = id;
-            this.isDeleteModalOpen = true;
-        },
-
-        // Reset Category Filter
         resetFilter() {
             this.category = '';
             if (window.HSSelect) {
@@ -201,9 +200,6 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        // --- 5. HELPERS ---
-
-        // Handle Image Input Change
         handleImageChange(e) {
             const file = e.target.files[0];
             const imagePreview = document.getElementById('imagePreview');
@@ -253,7 +249,6 @@ document.addEventListener('alpine:init', () => {
                 option.selected = ids.includes(parseInt(option.value));
             }
 
-            // Refresh Preline HSSelect if exists
             if (window.HSSelect) {
                 const instance = HSSelect.getInstance(select);
                 if (instance) instance.destroy();

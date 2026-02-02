@@ -25,7 +25,10 @@ class ProductController extends Controller {private $productService;
         $categories = $this->categoryService->getAll();
         
         if ($request->ajax()) {
-            return view('admin.partials.rows', compact('products'));
+            return response()->json([
+                'products' => $products->items(),
+                'pagination' => (string) $products->links('vendor.pagination.custom')
+            ]);
         }    
         return view('admin.partials.index', compact('products', 'categories'));
     }
@@ -48,6 +51,10 @@ class ProductController extends Controller {private $productService;
 
             $product->load('categories');
 
+            if ($request->ajax()) {
+                return response()->json($product);
+            }
+
             return view('admin.partials.row', compact('product'));
 
         } catch (\Exception $e) {
@@ -67,6 +74,11 @@ class ProductController extends Controller {private $productService;
         }
 
         $product = $this->productService->update($id, $data);
+        $product->load('categories');
+
+        if ($request->ajax()) {
+            return response()->json($product);
+        }
 
         return view('admin.partials.row', compact('product'));
     }

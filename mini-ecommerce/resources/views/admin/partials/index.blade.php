@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('content')
+@push('head-scripts')
 <script>
     window.translations = {
         product_updated: "{{ __('actions.product_updated') }}",
@@ -17,9 +17,12 @@
     window.adminConfig = {
         indexUrl: '{{ route('admin.partials.index') }}',
         initialProducts: {{ Js::from($products->items()) }},
-        initialPagination: '{!! $products->links('vendor.pagination.custom') !!}'
+        initialPagination: `{!! addslashes($products->links('vendor.pagination.custom')) !!}`
     };
 </script>
+@endpush
+
+@section('content')
 <main id="content" role="main" class="w-full  px-4 sm:px-6 md:px-8">
     
     <div class="mb-8 flex items-center justify-between flex-wrap gap-4">

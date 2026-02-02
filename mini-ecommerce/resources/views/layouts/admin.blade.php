@@ -7,6 +7,7 @@
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
        @vite(['resources/css/app.css', 'resources/js/actions.js', 'resources/js/app.js'])
+       @stack('head-scripts')
        
 </head>
 <body>

@@ -1,253 +1,259 @@
-import { showAlert } from './alearts';
-// Translations
- window.translations = {
-               product_updated: "{{ __('actions.product_updated') }}",
-               product_added: "{{ __('actions.product_added') }}",
-               product_deleted: "{{ __('actions.product_deleted') }}",
-               confirm_delete: "{{ __('actions.confirm_delete') }}",
-               error_occurred: "{{ __('actions.error_occurred') }}",
-               validation_error: "{{ __('actions.validation_error') }}",
-               server_error: "{{ __('actions.server_error') }}",
-               add: "{{ __('actions.add') }}",
-               edit: "{{ __('actions.edit') }}",
-           };
+import { showAlert } from './alearts.js';
 
+document.addEventListener('alpine:init', () => {
+    Alpine.data('productManager', (config = {}) => ({
+        // --- 1. STATE ---
+        products: config.initialProducts || [],
+        paginationHtml: config.initialPagination || '',
+        isProductModalOpen: false,
+        isDeleteModalOpen: false,
+        idToDelete: null,
+        search: '',
+        category: '',
+        isLoading: false,
+        mode: 'create', // 'create' or 'edit'
+        currentId: null,
+        
+        // --- 2. INIT ---
+        init() {
+            this.$watch('search', () => this.fetchProducts());
+            this.$watch('category', () => this.fetchProducts());
+            
+            if (window.createLucideIcons) window.createLucideIcons();
 
-// --- 1. VARIABLES & ELEMENTS ---
-let mode = "create";
-let currentId = null;
-let searchTimeout;
+            this.$nextTick(() => {
+                const filterSelect = document.getElementById('categoryFilter');
+                if (filterSelect) {
+                    filterSelect.addEventListener('change', (e) => {
+                        this.category = e.target.value;
+                    });
+                }
+            });
+        },
 
-const form = document.getElementById("productForm");
-const tableBody = document.getElementById("product-table-body");
-const submitBtn = document.getElementById("submitBtn");
-const searchInput = document.getElementById("productSearch");
-const categoryFilter = document.getElementById("categoryFilter");
-const imageInput = document.getElementById("af-submit-app-upload-images");
-const imagePreview = document.getElementById("imagePreview");
-const previewContainer = document.getElementById("previewContainer");
+        // --- 3. FETCHING (Search & Filter) ---
+        fetchProducts() {
+            const baseUrl = config.indexUrl || '/admin';
+            const finalUrl = `${baseUrl}?search=${encodeURIComponent(this.search)}&category_id=${this.category}`;
+            
+            this.isLoading = true;
+            fetch(finalUrl, {
+                headers: { 
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                this.products = data.products;
+                this.paginationHtml = data.pagination;
+                this.$nextTick(() => {
+                    if (window.createLucideIcons) window.createLucideIcons();
+                });
+            })
+            .catch(err => console.error('Fetch products failed:', err))
+            .finally(() => this.isLoading = false);
+        },
 
-// --- 2. MAIN FORM SUBMIT ---
-if (form) {
-    form.addEventListener("submit", function (e) {
-        e.preventDefault();
-        submitBtn.disabled = true;
+        // --- 4. CRUD OPERATIONS ---
 
-        const formData = new FormData(form);
+        openCreateModal() {
+            this.mode = 'create';
+            this.currentId = null;
+            this.isProductModalOpen = true;
+            
+            const form = document.getElementById('productForm');
+            if (form) form.reset();
+            
+            const pidField = document.getElementById('productId');
+            if (pidField) pidField.value = '';
+            
+            const submitBtn = document.getElementById('submitBtn');
+            if (submitBtn && window.translations) submitBtn.innerText = window.translations.add;
+            
+            this.hidePreview();
+            this.resetCategorySelect([]);
+            
+            if (window.createLucideIcons) window.createLucideIcons();
+        },
 
-        // Decide URL and Method based on mode
-        let url = form.dataset.storeUrl;
-        let method = "POST";
+        editProduct(product) {
+            this.mode = 'edit';
+            this.currentId = product.id;
+            this.isProductModalOpen = true;
 
-        if (mode === "edit") {
-            url = `/admin/products/${currentId}`;
-            formData.append("_method", "PUT"); // Laravel trick
-        }
+            const form = document.getElementById('productForm');
+            if (form) form.reset();
 
-        saveProduct(url, method, formData);
-    });
-}
+            document.getElementById('productId').value = product.id;
+            document.getElementById('productName').value = product.name;
+            document.getElementById('productPrice').value = product.price;
+            document.getElementById('productDescription').value = product.description;
 
-// --- 3. SAVE FUNCTION (Create & Edit) ---
-async function saveProduct(url, method, formData) {
-    try {
-        const response = await fetch(url, {
-            method: "POST", // Always POST for FormData (Laravel handles PUT via _method)
-            headers: {
-                "X-CSRF-TOKEN": document.querySelector(
-                    'meta[name="csrf-token"]',
-                ).content,
-                "X-Requested-With": "XMLHttpRequest",
-                Accept: "text/html",
-            },
-            body: formData,
-        });
+            const submitBtn = document.getElementById('submitBtn');
+            if (submitBtn && window.translations) submitBtn.innerText = window.translations.edit;
 
-        if (response.ok) {
-            const html = await response.text();
-
-            if (mode === "edit") {
-                document.getElementById(`row-${currentId}`).outerHTML = html;
-                showAlert(window.translations.product_updated);
+            const imagePreview = document.getElementById('imagePreview');
+            const previewContainer = document.getElementById('previewContainer');
+            if (product.image_url && imagePreview && previewContainer) {
+                imagePreview.src = `/images/${product.image_url}`;
+                previewContainer.classList.remove('hidden');
             } else {
-                tableBody.insertAdjacentHTML("afterbegin", html);
-                showAlert(window.translations.product_added);
+                this.hidePreview();
             }
 
-            closeModalAndReset();
-        } else {
-            handleError(response);
-        }
-    } catch (error) {
-        console.error(error);
-        showAlert(window.translations.error_occurred, "error");
-    } finally {
-        submitBtn.disabled = false;
-    }
-}
-
-// --- 4. DELETE FUNCTION ---
-window.deleteProduct = async function (id) {
-    if (!confirm(window.translations.confirm_delete)) return;
-
-    try {
-        const response = await fetch(`/admin/products/${id}`, {
-            method: "DELETE",
-            headers: {
-                "X-CSRF-TOKEN": document.querySelector(
-                    'meta[name="csrf-token"]',
-                ).content,
-                "X-Requested-With": "XMLHttpRequest",
-            },
-        });
-
-        if (response.ok) {
-            if (row) row.remove();
-            showAlert(window.translations.product_deleted);
-        } else {
-           showAlert(window.translations.error_occurred, "error");
-        }
-    } catch (error) {
-        console.error(error);
-    }
-};
-
-// --- 5. SEARCH & FILTER ---
-function fetchProducts() {
-    const url = searchInput.dataset.url || "/admin";
-    const search = searchInput.value;
-    const category = categoryFilter.value;
-
-    // Build URL: /admin?search=abc&category_id=1
-    const finalUrl = `${url}?search=${search}&category_id=${category}`;
-
-    fetch(finalUrl, {
-         headers: { "X-Requested-With": "XMLHttpRequest" } 
-        })
-        .then((response) => response.text())
-        .then((html) => {
-            tableBody.innerHTML = html;
-            // Reload icons if needed
+            const selectedIds = product.categories.map(c => c.id);
+            this.resetCategorySelect(selectedIds);
+            
             if (window.createLucideIcons) window.createLucideIcons();
-        });
-}
+        },
 
-if (searchInput) {
-    searchInput.addEventListener("input", function () {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(fetchProducts, 300);
-    });
-}
+        async saveProduct(e) {
+            const form = e.target;
+            const submitBtn = form.querySelector('[type=\"submit\"]');
+            if (submitBtn) submitBtn.disabled = true;
 
-if (categoryFilter) {
-    categoryFilter.addEventListener("change", fetchProducts);
-}
+            const formData = new FormData(form);
+            let url = form.dataset.storeUrl;
+            let method = 'POST';
 
-window.resetCategoryFilter = function () {
-    const select = document.getElementById("categoryFilter");
-    if (!select) return;
+            if (this.mode === 'edit') {
+                url = `/admin/products/${this.currentId}`;
+                formData.append('_method', 'PUT');
+            }
 
-    // 1. Reje3 l-valeur l khawa (vaut "")
-    select.value = "";
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=\"csrf-token\"]').content,
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                    body: formData,
+                });
 
-    // 2. Ila knti khdam b Preline HSSelect, khassna n-updatew l-interface
-    if (window.HSSelect) {
-        const instance = HSSelect.getInstance(select);
-        if (instance) {
-            // Reje3 selection l-placeholder
-            instance.setValue("");
+                if (response.ok) {
+                    const product = await response.json();
+
+                    if (this.mode === 'edit') {
+                        const index = this.products.findIndex(p => p.id === this.currentId);
+                        if (index !== -1) {
+                            this.products[index] = product;
+                        }
+                        if (window.translations) showAlert(window.translations.product_updated);
+                    } else {
+                        this.products.unshift(product);
+                        if (window.translations) showAlert(window.translations.product_added);
+                    }
+
+                    this.closeModalAndReset();
+                    this.$nextTick(() => {
+                        if (window.createLucideIcons) window.createLucideIcons();
+                    });
+                } else {
+                    this.handleError(response);
+                }
+            } catch (error) {
+                console.error(error);
+                if (window.translations) showAlert(window.translations.error_occurred, 'error');
+            } finally {
+                if (submitBtn) submitBtn.disabled = false;
+            }
+        },
+
+        confirmDelete(id) {
+            this.idToDelete = id;
+            this.isDeleteModalOpen = true;
+        },
+
+        deleteProduct() {
+            if (!this.idToDelete) return;
+
+            fetch(`/admin/products/${this.idToDelete}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=\"csrf-token\"]').content,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    this.products = this.products.filter(p => p.id !== this.idToDelete);
+                    if (window.showAlert) showAlert(window.translations.product_deleted);
+                } else {
+                    if (window.showAlert) showAlert(window.translations.error_occurred, 'error');
+                }
+            })
+            .finally(() => {
+                this.isDeleteModalOpen = false;
+                this.idToDelete = null;
+            });
+        },
+
+        resetFilter() {
+            this.category = '';
+            if (window.HSSelect) {
+                const inst = HSSelect.getInstance('#categoryFilter');
+                if (inst) inst.setValue('');
+            }
+        },
+
+        handleImageChange(e) {
+            const file = e.target.files[0];
+            const imagePreview = document.getElementById('imagePreview');
+            const previewContainer = document.getElementById('previewContainer');
+            if (file && imagePreview && previewContainer) {
+                imagePreview.src = URL.createObjectURL(file);
+                previewContainer.classList.remove('hidden');
+            }
+        },
+
+        // --- 5. HELPERS ---
+
+        closeModalAndReset() {
+            this.isProductModalOpen = false;
+            const form = document.getElementById('productForm');
+            if (form) form.reset();
+            this.hidePreview();
+            this.resetCategorySelect([]);
+            if (window.createLucideIcons) window.createLucideIcons();
+        },
+
+        hidePreview() {
+            const imagePreview = document.getElementById('imagePreview');
+            const previewContainer = document.getElementById('previewContainer');
+            if (imagePreview) imagePreview.src = '';
+            if (previewContainer) previewContainer.classList.add('hidden');
+        },
+
+        handleError(response) {
+            if (response.status === 422) {
+                response.json().then(data => {
+                    const message = data.message || (window.translations ? window.translations.validation_error : 'Validation Error');
+                    showAlert(message, 'error');
+                });
+            } else {
+                const errorMsg = (window.translations ? window.translations.server_error : 'Server Error') + ' ' + response.status;
+                showAlert(errorMsg, 'error');
+            }
+        },
+
+        resetCategorySelect(ids) {
+            const select = document.getElementById('categorySelect');
+            if (!select) return;
+
+            for (let i = 0; i < select.options.length; i++) {
+                const option = select.options[i];
+                option.selected = ids.includes(parseInt(option.value));
+            }
+
+            if (window.HSSelect) {
+                const instance = HSSelect.getInstance(select);
+                if (instance) instance.destroy();
+                new HSSelect(select);
+            }
         }
-    }
-
-    // 3. Dir l-appel l fetchProducts bach y-reje3 lina ga3 l-produits
-    fetchProducts();
-};
-// --- 6. UTILITIES & UI ---
-
-// Reset Form (Create Mode)
-window.openCreateModal = function () {
-    form.reset();
-    mode = "create";
-    currentId = null;
-    submitBtn.innerText = window.translations.add;
-    hidePreview();
-    resetCategorySelect([]);
-};
-
-// Fill Form (Edit Mode)
-window.editProduct = function (product) {
-    form.reset();
-    mode = "edit";
-    currentId = product.id;
-    submitBtn.innerText = window.translations.edit;
-
-    // Simple value assignment
-    document.getElementById("productName").value = product.name;
-    document.getElementById("productPrice").value = product.price;
-    document.getElementById("productDescription").value = product.description;
-
-    // Handle Image
-    if (product.image_url) {
-        imagePreview.src = `/images/${product.image_url}`;
-        previewContainer.classList.remove("hidden");
-    } else {
-        hidePreview();
-    }
-
-    // Handle Categories
-    const ids = product.categories.map(function (c) {
-        return c.id;
-    });
-    resetCategorySelect(ids);
-};
-
-function closeModalAndReset() {
-    window.openCreateModal(); // Resets vars
-    const modal = document.getElementById("hs-danger-alert");
-    if (window.HSOverlay) HSOverlay.close(modal);
-    if (window.createLucideIcons) window.createLucideIcons();
-}
-
-function hidePreview() {
-    imagePreview.src = "";
-    previewContainer.classList.add("hidden");
-}
-
-function handleError(response) {
-    if (response.status === 422) {
-        response.json().then((data) => {
-            alert(window.translations.validation_error);
-        });
-    } else {
-        alert(window.translations.server_error + " " + response.status);
-    }
-}
-
-// Image Preview Listener
-if (imageInput) {
-    imageInput.addEventListener("change", function (e) {
-        const file = e.target.files[0];
-        if (file) {
-            imagePreview.src = URL.createObjectURL(file);
-            previewContainer.classList.remove("hidden");
-        }
-    });
-}
-
-// Helper to handle the UI Library Select
-function resetCategorySelect(ids) {
-    const select = document.getElementById("categorySelect");
-    if (!select) return;
-
-    for (let i = 0; i < select.options.length; i++) {
-        const option = select.options[i];
-        option.selected = ids.includes(parseInt(option.value));
-    }
-
-    // Refresh UI Library (Preline UI)
-    if (window.HSSelect) {
-        const instance = HSSelect.getInstance(select);
-        if (instance) instance.destroy();
-        new HSSelect(select);
-    }
-}
+    }));
+});

@@ -1,6 +1,7 @@
 import './bootstrap';
 import 'preline'
-import { createIcons, icons } from "lucide";
+import { createIcons } from "lucide";
+import * as icons from "lucide";
 import Alpine from 'alpinejs'
  
 window.Alpine = Alpine
@@ -10,7 +11,9 @@ Alpine.start()
 
 // --- Lucide Icons ---
 const initLucide = () => {
-    createIcons({ icons }); // Always pass icons
+    // Handle both {icons} and * as icons structures
+    const iconsToUse = icons.icons || icons;
+    createIcons({ icons: iconsToUse }); 
 };
 
 // Expose globally if needed

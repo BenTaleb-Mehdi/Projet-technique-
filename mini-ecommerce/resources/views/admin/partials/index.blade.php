@@ -1,5 +1,27 @@
 @extends('layouts.admin')
 
+@push('head-scripts')
+<script>
+    window.translations = {
+        product_updated: "{{ __('actions.product_updated') }}",
+        product_added: "{{ __('actions.product_added') }}",
+        product_deleted: "{{ __('actions.product_deleted') }}",
+        confirm_delete: "{{ __('actions.confirm_delete') }}",
+        error_occurred: "{{ __('actions.error_occurred') }}",
+        validation_error: "{{ __('actions.validation_error') }}",
+        server_error: "{{ __('actions.server_error') }}",
+        add: "{{ __('actions.add') }}",
+        edit: "{{ __('actions.edit') }}",
+    };
+    
+    window.adminConfig = {
+        indexUrl: '{{ route('admin.partials.index') }}',
+        initialProducts: {{ Js::from($products->items()) }},
+        initialPagination: `{!! addslashes($products->links('vendor.pagination.custom')) !!}`
+    };
+</script>
+@endpush
+
 @section('content')
 <main id="content" role="main" class="w-full  px-4 sm:px-6 md:px-8">
     
@@ -10,12 +32,8 @@
         </div>
         <div class="flex gap-2">
             <button type="button" 
-                    onclick="openCreateModal()"
-                    class="inline-flex items-center gap-x-2 py-2.5 px-4 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm"
-                    aria-haspopup="dialog" 
-                    aria-expanded="false" 
-                    aria-controls="hs-danger-alert" 
-                    data-hs-overlay="#hs-danger-alert">
+                    @click="openCreateModal()"
+                    class="inline-flex items-center gap-x-2 py-2.5 px-4 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm">
                 <i data-lucide="plus" class="w-4 h-4"></i>
                 {{ __('actions.add_product') }}
             </button>
@@ -25,15 +43,20 @@
             <div class="flex flex-wrap items-left gap-4 justify-end">
                 <div class="relative w-full sm:w-100">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <i data-lucide="search" class="w-4 h-4 text-gray-400"></i>
+                        <i data-lucide="search" class="w-4 h-4 text-gray-400" x-show="!isLoading"></i>
+                        <div x-show="isLoading" x-cloak class="animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent"></div>
                     </div>
-                    <input id="productSearch" type="text" placeholder="{{ __('views.search_product_placeholder') }}"  data-url="{{ route('admin.partials.index') }}"
+                    <input id="productSearch" type="text" 
+                           x-model.debounce.300ms="search"
+                           placeholder="{{ __('views.search_product_placeholder') }}" 
                            class="py-3 pl-10 pr-4 block w-full bg-gray-50 border border-gray-200 text-gray-800 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
                 </div>
 
                 <div class="relative inline-block text-left w-full sm:w-56">
                     <!-- Select -->
-                    <select id="categoryFilter" data-url="{{ route('admin.partials.index') }}" data-hs-select='{
+                    <select id="categoryFilter" 
+                            x-model="category"
+                            data-hs-select='{
                         "placeholder": "{{ __('views.select_placeholder') }}",
                         "toggleTag": "<button type=\"button\" aria-expanded=\"false\"></button>",
                         "toggleClasses": "hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative py-3 ps-4 pe-9 flex gap-x-2 text-nowrap w-full cursor-pointer bg-white border border-gray-200 rounded-lg text-start text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500",
@@ -49,7 +72,7 @@
                     </select>
                     <!-- End Select -->
                      <button type="button" 
-                            onclick="resetCategoryFilter()" 
+                            @click="resetFilter()" 
                             class="absolute top-1/2 end-8 -translate-y-1/2 text-gray-400 hover:text-red-500 z-20">
                         <svg class="size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                     </button>
@@ -72,22 +95,116 @@
                         <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ __('views.actions') }}</th>
                     </tr>
                 </thead>
-                <tbody id="product-table-body" class="divide-y divide-gray-200 bg-white">
-                    @foreach($products as $product)
-                        @include('admin.partials.row', ['product' => $product])
-                    @endforeach
+                <tbody id="product-table-body" 
+                       class="divide-y divide-gray-200 bg-white transition-opacity duration-200"
+                       :class="isLoading ? 'opacity-50 pointer-events-none' : ''">
+                    <template x-for="product in products" :key="product.id">
+                        <tr class="hover:bg-gray-50 transition" :id="'row-' + product.id">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                <template x-if="product.image_url">
+                                    <img :src="'/images/' + product.image_url" class="h-10 w-10 rounded-full object-cover" :alt="product.name">
+                                </template>
+                                <template x-if="!product.image_url">
+                                    <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                                        <i data-lucide="image" class="w-5 h-5"></i>
+                                    </div>
+                                </template>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-800" x-text="product.name"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                                      x-text="new Number(product.price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' $'">
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">
+                                <div class="flex flex-wrap gap-1">
+                                    <template x-for="cat in (product.categories || [])" :key="cat.id">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800" x-text="cat.label"></span>
+                                    </template>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600 max-w-xs truncate" x-text="product.description || ''"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
+                                <div class="flex justify-end gap-x-3">
+                                    <button type="button" @click="editProduct(product)" class="text-indigo-500 hover:text-indigo-900 font-semibold">
+                                        <i data-lucide="pencil" class="size-4"></i>
+                                    </button>
+                                    <button type="button" @click="confirmDelete(product.id)" class="text-red-500 hover:text-red-800 font-semibold">
+                                        <i data-lucide="trash-2" class="size-4"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </template>
+                    <template x-if="products.length === 0 && !isLoading">
+                        <tr>
+                            <td colspan="6" class="px-6 py-10 text-center text-gray-500">
+                                {{ __('views.no_products_found') ?? 'No products found.' }}
+                            </td>
+                        </tr>
+                    </template>
                 </tbody>
             </table>
         </div>
 
-        @if($products->hasPages())
-        <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end">
-            {{ $products->links('vendor.pagination.custom') }}
+        <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end" 
+             x-show="paginationHtml" 
+             x-html="paginationHtml">
         </div>
-        @endif
     </div>
-</main>
+
 
 @include('admin.partials.form')
+
+<!-- Delete Confirmation Modal -->
+<div class="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-y-auto" 
+     x-show="isDeleteModalOpen"
+     x-cloak>
+  
+  <!-- Backdrop -->
+  <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm" 
+       x-show="isDeleteModalOpen"
+       x-transition:enter="ease-out duration-300"
+       x-transition:enter-start="opacity-0"
+       x-transition:enter-end="opacity-100"
+       x-transition:leave="ease-in duration-200"
+       x-transition:leave-start="opacity-100"
+       x-transition:leave-end="opacity-0"
+       @click="isDeleteModalOpen = false"></div>
+
+  <!-- Modal Card -->
+  <div class="relative bg-white border border-gray-200 shadow-xl rounded-xl overflow-hidden max-w-md w-full z-10 p-6 text-center"
+       x-show="isDeleteModalOpen"
+       x-transition:enter="ease-out duration-300"
+       x-transition:enter-start="opacity-0 scale-95"
+       x-transition:enter-end="opacity-100 scale-100"
+       x-transition:leave="ease-in duration-200"
+       x-transition:leave-start="opacity-100 scale-100"
+       x-transition:leave-end="opacity-0 scale-95">
+       
+       <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+           <i data-lucide="alert-triangle" class="h-6 w-6 text-red-600"></i>
+       </div>
+
+       <h3 class="text-lg font-bold text-gray-900 mb-2">{{ __('actions.confirm_delete') }}</h3>
+       <p class="text-sm text-gray-500 mb-6">
+           {{ __('views.delete_warning_message') ?? 'Are you sure you want to delete this product? This action cannot be undone.' }}
+       </p>
+
+       <div class="flex justify-center gap-3">
+           <button type="button" 
+                   @click="isDeleteModalOpen = false"
+                   class="py-2 px-4 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 transition-all">
+               {{ __('actions.cancel') }}
+           </button>
+           <button type="button" 
+                    @click="deleteProduct()"
+                    class="py-2 px-4 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-red-600 text-white hover:bg-red-700 transition-all shadow-sm">
+                {{ __('actions.delete') }}
+            </button>
+       </div>
+    </div>
+</div>
+</main>
 
 @endsection

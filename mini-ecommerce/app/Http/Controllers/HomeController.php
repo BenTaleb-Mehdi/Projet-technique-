@@ -2,28 +2,36 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Services\ProductService;
 
 class HomeController extends Controller
 {
-    private $productService;
-
-    public function __construct(ProductService $productService)
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
     {
-        $this->productService = $productService;
+        $this->middleware('auth');
     }
 
-    public function index()
+    /**
+     * Show the application dashboard.
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function index(ProductService $product)
     {
-        $products = $this->productService->getAll();
+        $products = $product->getAll();
         return view('products.index', compact('products'));
     }
 
-    public function show($id)
+    // Add this new method:
+    public function show($id, ProductService $productService)
     {
-        $product = $this->productService->find($id);
-    
+        $product = $productService->find($id); // This uses your Service find() method
         return view('products.show', compact('product'));
     }
 }

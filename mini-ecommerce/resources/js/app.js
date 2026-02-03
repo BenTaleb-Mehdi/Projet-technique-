@@ -24,3 +24,4 @@ document.addEventListener("DOMContentLoaded", () => {
     initLucide(); // Icons on page load
     document.addEventListener("preline:ready", initLucide);
 });
+

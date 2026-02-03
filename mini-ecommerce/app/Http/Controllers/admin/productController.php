@@ -24,7 +24,7 @@ class ProductController extends Controller {private $productService;
         $products = $this->productService->getAll($request->all());
         $categories = $this->categoryService->getAll();
         
-        if ($request->ajax()) {
+        if ($request->ajax() && $request->wantsJson()) {
             return response()->json([
                 'products' => $products->items(),
                 'pagination' => (string) $products->links('vendor.pagination.custom')

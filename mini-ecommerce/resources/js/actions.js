@@ -1,6 +1,7 @@
 import { showAlert } from './alearts.js';
 
 document.addEventListener('alpine:init', () => {
+    const config = window.adminConfig || {};
     Alpine.data('productManager', (config = {}) => ({
         // --- 1. STATE ---
         products: config.initialProducts || [],
@@ -15,21 +16,28 @@ document.addEventListener('alpine:init', () => {
         currentId: null,
         
         // --- 2. INIT ---
-        init() {
-            this.$watch('search', () => this.fetchProducts());
-            this.$watch('category', () => this.fetchProducts());
-            
-            if (window.createLucideIcons) window.createLucideIcons();
+// Add a console log to see if data is actually arriving
+init() {
+    console.log("Config detected:", window.adminConfig); 
 
-            this.$nextTick(() => {
-                const filterSelect = document.getElementById('categoryFilter');
-                if (filterSelect) {
-                    filterSelect.addEventListener('change', (e) => {
-                        this.category = e.target.value;
-                    });
-                }
-            });
-        },
+    if (window.adminConfig) {
+        // Force assignment and ensure it's an array
+        this.products = Array.isArray(window.adminConfig.initialProducts) 
+            ? window.adminConfig.initialProducts 
+            : [];
+            
+        this.paginationHtml = window.adminConfig.initialPagination || '';
+    }
+
+    this.$watch('search', () => this.fetchProducts());
+    this.$watch('category', () => this.fetchProducts());
+
+    this.$nextTick(() => {
+        if (window.createLucideIcons) window.createLucideIcons();
+    });
+    
+},
+
 
         // --- 3. FETCHING (Search & Filter) ---
         fetchProducts() {
@@ -254,6 +262,39 @@ document.addEventListener('alpine:init', () => {
                 if (instance) instance.destroy();
                 new HSSelect(select);
             }
+        },
+        // --- ADD THESE TO YOUR productManager OBJECT ---
+
+handlePagination(e) {
+    const link = e.target.closest('a');
+    if (!link || !link.href) return;
+
+    e.preventDefault(); // Stop page reload
+    this.fetchPage(link.href);
+},
+
+fetchPage(url) {
+    this.isLoading = true;
+    
+    fetch(url, {
+        headers: { 
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
         }
+    })
+    .then(res => res.json())
+    .then(data => {
+        this.products = data.products;
+        this.paginationHtml = data.pagination;
+        
+        // Refresh icons and scroll to top
+        this.$nextTick(() => {
+            if (window.createLucideIcons) window.createLucideIcons();
+            document.getElementById('content').scrollIntoView({ behavior: 'smooth' });
+        });
+    })
+    .catch(err => console.error('Pagination Error:', err))
+    .finally(() => this.isLoading = false);
+}
     }));
 });

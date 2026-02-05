@@ -30,7 +30,7 @@ class ProductController extends Controller {private $productService;
                 'pagination' => (string) $products->links('vendor.pagination.custom')
             ]);
         }    
-        return view('admin.partials.index', compact('products', 'categories'));
+        return view('admin.index', compact('products', 'categories'));
     }
 
     public function store(StoreProductRequest $request)

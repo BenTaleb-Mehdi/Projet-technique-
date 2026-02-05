@@ -15,11 +15,6 @@
 
     <div id="hs-navbar-example" class="hidden hs-collapse overflow-hidden transition-all duration-300 basis-full grow sm:block" aria-labelledby="hs-navbar-example-collapse">
       <div class="flex flex-col gap-5 mt-5 sm:flex-row sm:items-center sm:justify-end sm:mt-0 sm:ps-5">
-        
-       
-
-
-
         @auth
         <div class="hs-dropdown relative inline-flex ms-2">
           <button id="hs-dropdown-account" type="button" class="hs-dropdown-toggle py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none">
@@ -39,7 +34,7 @@
             </div>
 
             @if(Auth::user()->role === 'admin')
-            <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none" href="{{ route('admin.partials.index') }}">
+            <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none" href="{{ route('admin.index') }}">
               <i data-lucide="layout-dashboard" class="size-4"></i> {{ __('views.dashboard') }}
             </a>
             @endif

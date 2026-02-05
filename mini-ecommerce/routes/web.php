@@ -22,7 +22,7 @@ Auth::routes();
 Route::middleware(['auth'])->prefix('admin')->group(function () {
 
     // 1. Common Actions (Both Admin and Seller can access these)
-    Route::get('/', [ProductController::class, 'index'])->name('admin.partials.index');
+    Route::get('/', [ProductController::class, 'index'])->name('admin.index');
     Route::post('/products/store', [ProductController::class, 'store'])->name('products.store');
     Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
 

@@ -35,8 +35,6 @@ style: |
     border-radius: 8px;
 
   }
- 
-
 ---
 
 
@@ -50,18 +48,28 @@ style: |
 
 ---
 
-### Waterfall 
+## Travail à faire
+
+**Développer l'Application Mini E-Commerce (Product/Categories)**
+
+* **Partie Publique :** Interface permettant aux visiteurs de consulter les produits et leurs catégories. 
+    * **Fonctionnalités :** pagination (10 produits/page).
+* **Partie Admin :** Tableau de bord sécurisé pour la gestion complète du catalogue (CRUD). 
+    * **Fonctionnalités :** Modales pour l’ajout et l’édition d'éléments, intégration de AJAX - Alpine.js pour les mises à jour asynchrones (sans rechargement de page).
+
+---
+## Waterfall 
 
 ![w:900 Waterfall](images/Waterfall.png)
 
 ---
-# Contexte 
+## Contexte 
 
 ![w:500 2TUP](images/2TUP.png)
 
 
 ---
-# Exigences - Analyse Technique
+## Exigences - Analyse Technique
 
 ### Les Technologies a Utiliser (parte 1)
 1. Base de donnee : Mysql 
@@ -81,20 +89,34 @@ style: |
 
 ---
 
-### Analyse - Fonctionnalités
+## Analyse - Fonctionnalités
 
 
 ![w:1150 usecase](images/usecase.png)
 
 ---
 
-### Conception 
+## Conception 
 
 ![w:1050 diagramme de class](images/diagramme_class.png)
 
 ---
 
-### Sujet - Live coding
+## Sujet - Live coding
 
 - Un bouton “Ajouter” qui ouvre une modale pour créer un nouvel élément.
 - Une barre de recherche filtrant des éléments par titre.
+
+---
+
+## Versions
+
+| Version | Branch name | code version | 
+| :--- | :--- | :--- | 
+| v1 : Public side | public |  | 
+| v2 : Admin side | admin | prototype-admin , live-coding-admin |
+| v3 : Authontification / Authorization (Gates)| gates ||
+| v4 : SPA (Ajax - Alpine.js) | Ajax - Alpine.js | prototype-ajax , live-coding-ajax | 
+| v5 : Spatie Authoresation | spatie | live-coding-spatie | 
+| v6 : API | api |  |
+| v7 : Mobile | mobile | |

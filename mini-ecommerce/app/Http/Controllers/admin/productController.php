@@ -24,9 +24,10 @@ class ProductController extends Controller {private $productService;
         $products = $this->productService->getAll($request->all());
         $categories = $this->categoryService->getAll();
         
-        if ($request->ajax() && $request->wantsJson()) {
+        if ($request->ajax()) {
             return response()->json([
                 'products' => $products->items(),
+                'categories' => $categories,
                 'pagination' => (string) $products->links('vendor.pagination.custom')
             ]);
         }    
@@ -38,7 +39,7 @@ class ProductController extends Controller {private $productService;
         try {
             $data = $request->validated();
 
-            $data['user_id'] = auth()->id() ?? 1;
+            $data['user_id'] = auth()->id();
 
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
@@ -52,7 +53,10 @@ class ProductController extends Controller {private $productService;
             $product->load('categories');
 
             if ($request->ajax()) {
-                return response()->json($product);
+                return response()->json([
+                    'product' => $product,
+                    'message' => __('actions.product_added')
+                ]);
             }
 
             return view('admin.partials.row', compact('product'));
@@ -77,7 +81,10 @@ class ProductController extends Controller {private $productService;
         $product->load('categories');
 
         if ($request->ajax()) {
-            return response()->json($product);
+            return response()->json([
+                'product' => $product,
+                'message' => __('actions.product_updated')
+            ]);
         }
 
         return view('admin.partials.row', compact('product'));
@@ -86,6 +93,9 @@ class ProductController extends Controller {private $productService;
     public function destroy($id)
     {
         $this->productService->delete($id);
-        return response()->json(['success' => true]);
+        return response()->json([
+            'success' => true,
+            'message' => __('actions.product_deleted')
+        ]);
     }
 }

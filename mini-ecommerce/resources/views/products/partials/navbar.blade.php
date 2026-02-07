@@ -37,6 +37,10 @@
             <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none" href="{{ route('admin.index') }}">
               <i data-lucide="layout-dashboard" class="size-4"></i> {{ __('views.dashboard') }}
             </a>
+            @else
+            <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none" href="{{ route('admin.index') }}">
+              <i data-lucide="layout-dashboard" class="size-4"></i> {{ __('views.dashboard') }}
+            </a>
             @endif
 
             <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none" href="{{ route('lang.switch', 'en') }}">
@@ -65,8 +69,11 @@
           </div>
         </div>
         @else
+        <a class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none" href="{{ route('register') }}">
+          {{ __('actions.register') }}
+        </a>
         <a class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none" href="{{ route('login') }}">
-          Login
+          {{ __('actions.login') }}
         </a>
         @endauth
 

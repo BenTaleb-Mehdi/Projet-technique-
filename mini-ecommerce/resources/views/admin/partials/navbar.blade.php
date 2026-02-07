@@ -42,6 +42,10 @@
             <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none" href="{{ route('products.index') }}">
               <i data-lucide="layout-list" class="size-4"></i> {{ __('views.products') }}
             </a>
+            @else
+            <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none" href="{{ route('products.index') }}">
+              <i data-lucide="layout-list" class="size-4"></i> {{ __('views.products') }}
+            </a>
             @endif
 
             <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none" href="{{ route('lang.switch', 'en') }}">

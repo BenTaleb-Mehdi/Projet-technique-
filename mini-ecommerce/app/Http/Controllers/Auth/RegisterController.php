@@ -53,7 +53,6 @@ protected function validator(array $data)
         'name' => ['required', 'string', 'max:255'],
         'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
         'password' => ['required', 'string', 'min:8', 'confirmed'],
-        'role' => ['required', 'string', 'in:admin,seller'], // Ensure role is valid
     ]);
 }
 
@@ -64,7 +63,7 @@ protected function create(array $data)
         'name' => $data['name'],
         'email' => $data['email'],
         'password' => Hash::make($data['password']),
-        'role' => $data['role'], // Map the form select value
+        'role' => 'seller', // Default to seller
     ]);
 }
 

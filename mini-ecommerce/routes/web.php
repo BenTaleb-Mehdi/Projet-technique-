@@ -19,6 +19,7 @@ Route::get('lang/{locale}', function ($locale) {
 Auth::routes();
 
 // --- Protected Admin/Seller Area ---
+// --- Protected Admin/Seller Area ---
 Route::middleware(['auth'])->prefix('admin')->group(function () {
 
     // 1. Common Actions (Both Admin and Seller can access these)
@@ -30,10 +31,6 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     // We use the 'can' middleware which points directly to the Gate we defined earlier
     Route::middleware(['can:delete-product'])->group(function () {
         Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
-        
-        // You can add more admin-only routes here later, like:
-        // Route::get('/users', [UserController::class, 'index']);
     });
 });
 
-// Route::get('/home', [HomeController::class, 'index'])->name('home');

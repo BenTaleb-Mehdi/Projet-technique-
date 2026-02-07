@@ -1,27 +1,25 @@
 import './bootstrap';
-import 'preline'
-import { createIcons } from "lucide";
-import * as icons from "lucide";
-import Alpine from 'alpinejs'
- 
-window.Alpine = Alpine
- 
-Alpine.start()
+import 'preline';
+import Alpine from 'alpinejs';
+import { createIcons, icons } from "lucide";
+import { showAlert } from './components/alerts.js';
+import productManager from './components/productManager.js';
+
+window.Alpine = Alpine;
 
 
-// --- Lucide Icons ---
-const initLucide = () => {
-    // Handle both {icons} and * as icons structures
-    const iconsToUse = icons.icons || icons;
-    createIcons({ icons: iconsToUse }); 
-};
+window.createLucideIcons = () => createIcons({ icons });
 
-// Expose globally if needed
-window.createLucideIcons = initLucide;
 
-// --- DOMContentLoaded ---
+window.showAlert = showAlert;
+
 document.addEventListener("DOMContentLoaded", () => {
-    initLucide(); // Icons on page load
-    document.addEventListener("preline:ready", initLucide);
+    window.createLucideIcons();
+    document.addEventListener("preline:ready", window.createLucideIcons);
 });
 
+document.addEventListener('alpine:init', () => {
+    Alpine.data('productManager', productManager);
+});
+
+Alpine.start();

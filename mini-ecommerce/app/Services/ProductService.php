@@ -27,7 +27,7 @@ class ProductService extends BaseService
             });
         }
         
-        return $this->applyPagination($query);
+        return $this->applyPagination($query)->appends(request()->query());
     }
 
     public function create(array $data)

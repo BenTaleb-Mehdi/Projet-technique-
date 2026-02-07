@@ -27,10 +27,11 @@ class ProductController extends Controller {private $productService;
         if ($request->ajax()) {
             return response()->json([
                 'products' => $products->items(),
+                'categories' => $categories,
                 'pagination' => (string) $products->links('vendor.pagination.custom')
             ]);
         }    
-        return view('admin.partials.index', compact('products', 'categories'));
+        return view('admin.index', compact('products', 'categories'));
     }
 
     public function store(StoreProductRequest $request)
@@ -52,7 +53,10 @@ class ProductController extends Controller {private $productService;
             $product->load('categories');
 
             if ($request->ajax()) {
-                return response()->json($product);
+                return response()->json([
+                    'product' => $product,
+                    'message' => __('actions.product_added')
+                ]);
             }
 
             return view('admin.partials.row', compact('product'));
@@ -77,7 +81,10 @@ class ProductController extends Controller {private $productService;
         $product->load('categories');
 
         if ($request->ajax()) {
-            return response()->json($product);
+            return response()->json([
+                'product' => $product,
+                'message' => __('actions.product_updated')
+            ]);
         }
 
         return view('admin.partials.row', compact('product'));
@@ -86,6 +93,9 @@ class ProductController extends Controller {private $productService;
     public function destroy($id)
     {
         $this->productService->delete($id);
-        return response()->json(['success' => true]);
+        return response()->json([
+            'success' => true,
+            'message' => __('actions.product_deleted')
+        ]);
     }
 }

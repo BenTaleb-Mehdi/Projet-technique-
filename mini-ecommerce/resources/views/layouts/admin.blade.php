@@ -11,7 +11,7 @@
        
 </head>
 <body>
-    <div id="admin-layout" x-data="productManager(window.adminConfig || {})">
+    <div id="admin-layout">
 
 
 @include('admin.partials.navbar')

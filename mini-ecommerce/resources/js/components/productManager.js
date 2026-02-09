@@ -1,7 +1,7 @@
 import { productService } from '../services/productService.js';
 import { showAlert } from './alearts.js';
 
-export default () => ({
+export default (config = {}) => ({
     products: [],
     paginationHtml: '',
     isProductModalOpen: false,
@@ -14,7 +14,7 @@ export default () => ({
     currentId: null,
     indexUrl: '',
     errors: {},
-    allCategories: [],
+    allCategories: config.categories || [],
 
     init() {
         this.indexUrl = this.$root.dataset.url;
@@ -22,6 +22,18 @@ export default () => ({
         
         this.$watch('search', () => this.fetchProducts());
         this.$watch('category', () => this.fetchProducts());
+        this.$watch('allCategories', () => {
+            this.$nextTick(() => {
+                if (window.HSStaticMethods) {
+                    const select = document.getElementById('categorySelect');
+                    if (select) {
+                        // Forcing Preline to re-initialize even if it was already attached
+                        select.removeAttribute('data-hs-select-attached');
+                        window.HSStaticMethods.autoInit();
+                    }
+                }
+            });
+        });
         this.refreshIcons();
     },
 

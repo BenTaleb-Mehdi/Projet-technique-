@@ -4,7 +4,7 @@
         role="main" 
         class="w-full px-4 sm:px-6 md:px-8" 
         data-url="{{ route('admin.partials.index') }}"
-        x-data="productManager">   
+        x-data="productManager({ categories: {{ $categories->toJson() }} })">   
     @include('admin.partials.alert')
     @include('admin.partials.header')
     @include('admin.partials.table')

@@ -1,5 +1,5 @@
 import { baseLogic } from './baseComponent.js';
-import { showAlert } from './alearts.js';
+import { showAlert } from './alerts.js';
 
 /** * 1. Product Service: Hna feyn l-atassal b-l'Backend (Laravel/API)
  */
@@ -116,6 +116,11 @@ export default (config = {}) => ({
 
             this.reinitUI();
         });
+    },
+
+    confirmDelete(id) {
+        this.idToDelete = id;
+        this.isDeleteModalOpen = true;
     },
 
     deleteProduct() {

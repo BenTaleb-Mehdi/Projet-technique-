@@ -48,7 +48,7 @@ style: |
 
 ---
 
-## Travail à faire
+## Exigences: Travail à faire
 
 **Développer l'Application Mini E-Commerce (Product/Categories)**
 
@@ -69,7 +69,7 @@ style: |
 
 
 ---
-## Exigences - Analyse Technique
+## Analyse Technique
 
 ### Les Technologies a Utiliser (parte 1)
 1. Base de donnee : Mysql 

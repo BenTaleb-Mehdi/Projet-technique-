@@ -85,6 +85,10 @@ style: |
 9. Vite
 10. Preline Ui
 11. Lucide Library (icons)
+12. Alpine
+13. spatie
+14. laravel/ui
+
 
 
 ---
@@ -103,7 +107,6 @@ style: |
 ---
 
 ## Sujet - Live coding
-
 - Un bouton “Ajouter” qui ouvre une modale pour créer un nouvel élément.
 - Une barre de recherche filtrant des éléments par titre.
 

@@ -131,3 +131,7 @@ style: |
 | **v5: Spatie Authorization** | `spatie` | `live-coding-spatie` |
 | **v6: API** | `api` | — |
 | **v7: Mobile** | `mobile` | — |
+
+---
+
+## Conclusion

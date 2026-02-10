@@ -114,12 +114,12 @@ style: |
 
 ## Versions
 
-| Version | Branch name | code version | 
-| :--- | :--- | :--- | 
-| v1 : Public side | public |  | 
-| v2 : Admin side | admin | prototype-admin , live-coding-admin |
-| v3 : Authontification / Authorization (Gates)| gates ||
-| v4 : SPA (ajax , alpine) | ajax , alpine | prototype-ajax , live-coding-ajax | 
-| v5 : Spatie Authoresation | spatie | live-coding-spatie | 
-| v6 : API | api |  |
-| v7 : Mobile | mobile | |
+| Version | Branch Name | Code Version / Tags |
+| :--- | :--- | :--- |
+| **v1: Public Side** | `public` | — |
+| **v2: Admin Side** | `admin` | `prototype-admin`, `live-coding-admin` |
+| **v3: Authentication / Authorization (Gates)** | `gates` | — |
+| **v4: SPA (AJAX, Alpine.js)** | `ajax-alpine` | `prototype-ajax`, `live-coding-ajax` |
+| **v5: Spatie Authorization** | `spatie` | `live-coding-spatie` |
+| **v6: API** | `api` | — |
+| **v7: Mobile** | `mobile` | — |

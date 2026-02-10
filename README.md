@@ -58,12 +58,24 @@ style: |
     * **Fonctionnalités :** Modales pour l’ajout et l’édition d'éléments, intégration de AJAX - Alpine.js pour les mises à jour asynchrones (sans rechargement de page).
 
 ---
-## Waterfall 
+
+## Plan
+
+1. Méthode Waterfall
+2. Exigences : Travail à faire
+3. Contexte : Projet de Fin de Formation
+4. Analyse Technique
+5. Analyse : Analyse Fonctionnelle
+6. Conception
+7. Versions (v1 - v8)
+
+---
+## Méthode Waterfall (En cascade)
 
 ![w:900 Waterfall](images/Waterfall.png)
 
 ---
-## Contexte 
+## Contexte: Projet de Fin de Formation
 
 ![w:500 2TUP](images/2TUP.png)
 
@@ -93,22 +105,18 @@ style: |
 
 ---
 
-## Analyse - Fonctionnalités
+## Analyse: Analyse Fonctionnelle
 
 
 ![w:1150 usecase](images/usecase.png)
 
 ---
 
-## Conception 
+## Conception
+
 
 ![w:1050 diagramme de class](images/diagramme_class.png)
 
----
-
-## Sujet - Live coding
-- Un bouton “Ajouter” qui ouvre une modale pour créer un nouvel élément.
-- Une barre de recherche filtrant des éléments par titre.
 
 ---
 
@@ -116,7 +124,7 @@ style: |
 
 | Version | Branch Name | Code Version / Tags |
 | :--- | :--- | :--- |
-| **v1: Public Side** | `public` | — |
+| **v1: Public Side** | `public` | `Live Coding : Création du portfolio personnel` |
 | **v2: Admin Side** | `admin` | `prototype-admin`, `live-coding-admin` |
 | **v3: Authentication / Authorization (Gates)** | `gates` | — |
 | **v4: SPA (AJAX, Alpine)** | `ajax, alpine` | `prototype-ajax`, `live-coding-ajax` |

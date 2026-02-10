@@ -2,8 +2,11 @@
 use App\Http\Controllers\admin\ProductController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 // --- Public Routes ---
+// --- Public Routes ---
+// Beddel 'home' b 'products.index' bach kolchi yerje3 khdam
 Route::get('/', [HomeController::class, 'index'])->name('products.index');
 Route::get('/products/{product}', [HomeController::class, 'show'])->name('products.show');
 
@@ -19,18 +22,16 @@ Route::get('lang/{locale}', function ($locale) {
 Auth::routes();
 
 // --- Protected Admin/Seller Area ---
-// --- Protected Admin/Seller Area ---
-Route::middleware(['auth'])->prefix('admin')->group(function () {
+// Zdna 'as' bach les noms dial les routes y-bdaw b 'admin.'
+Route::middleware(['auth'])->prefix('admin')->as('admin.')->group(function () {
 
-    // 1. Common Actions (Both Admin and Seller can access these)
-    Route::get('/', [ProductController::class, 'index'])->name('admin.index');
+    // Common Actions (Admin & Seller)
+    Route::get('/', [ProductController::class, 'index'])->name('index');
     Route::post('/products/store', [ProductController::class, 'store'])->name('products.store');
     Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
 
-    // 2. RESTRICTED Actions (Only Admin)
-    // We use the 'can' middleware which points directly to the Gate we defined earlier
-    Route::middleware(['can:delete-product'])->group(function () {
-        Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
-    });
+    // Restricted Actions (Admin)
+    // Nasiha: Khlli l-authorization west l-controller (ProductController@destroy)
+    // Bach l-Middleware dyal l-Exception y-detectiha s7i7.
+    Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 });
-

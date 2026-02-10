@@ -21,6 +21,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+
+        /*
         // Gate for general management (Both Admin and Seller)
         Gate::define('manage-products', function (User $user) {
             return in_array($user->role, ['admin', 'seller']);
@@ -30,5 +32,13 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('delete-product', function (User $user) {
             return $user->role === 'admin';
         });
+        */
+
+        Gate::define('is-logged-in', function ($user) {
+                return true; 
+            });
+
+
+
     }
 }

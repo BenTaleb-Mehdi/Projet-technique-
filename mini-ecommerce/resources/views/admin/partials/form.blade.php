@@ -34,7 +34,7 @@
         <div class="w-full px-3 sm:px-6 lg:px-6 mx-auto pb-6">
             <form id="productForm" 
                   @submit.prevent="saveProduct($event)" 
-                  data-store-url="{{ route('products.store') }}" 
+                  data-store-url="{{ route('admin.products.store') }}" 
                   class="pt-0 p-4 sm:pt-0 sm:p-7">
                 @csrf
                 <input type="hidden" name="id" :value="currentId">

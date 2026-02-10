@@ -21,6 +21,7 @@ class HomeController extends Controller
      */
     public function index(ProductService $product)
     {
+        $this->authorize();
         $products = $product->getAll();
         return view('products.index', compact('products'));
     }
@@ -28,6 +29,7 @@ class HomeController extends Controller
     // Add this new method:
     public function show($id, ProductService $productService)
     {
+        $this->authorize();
         $product = $productService->find($id); // This uses your Service find() method
         return view('products.show', compact('product'));
     }

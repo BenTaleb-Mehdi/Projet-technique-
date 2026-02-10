@@ -119,7 +119,7 @@ style: |
 | **v1: Public Side** | `public` | — |
 | **v2: Admin Side** | `admin` | `prototype-admin`, `live-coding-admin` |
 | **v3: Authentication / Authorization (Gates)** | `gates` | — |
-| **v4: SPA (AJAX, Alpine.js)** | `ajax-alpine` | `prototype-ajax`, `live-coding-ajax` |
+| **v4: SPA (AJAX, Alpine)** | `ajax, alpine` | `prototype-ajax`, `live-coding-ajax` |
 | **v5: Spatie Authorization** | `spatie` | `live-coding-spatie` |
 | **v6: API** | `api` | — |
 | **v7: Mobile** | `mobile` | — |

@@ -1,7 +1,4 @@
-/**
- * baseComponent.js
- * Hada fih l-logic l-mushtaraka li ghadi t-khdem biha f'ga3 l-modules
- */
+
 export const baseLogic = (service) => ({
     items: [],
     paginationHtml: '',
@@ -12,19 +9,15 @@ export const baseLogic = (service) => ({
     isDeleteModalOpen: false,
     errors: {},
 
-    // Function dyal Fetching m3a l-Pagination o Search
     async fetchData(url = null, extraParams = {}) {
         this.isLoading = true;
         try {
             const fetchUrl = url || this.indexUrl;
-            // Kan-3ayto l-service li ghadi n-passiw f'productManager
             const data = await service.fetch(fetchUrl, this.search, extraParams);
             
-            // Kan-stockiw l-data li jatna
             this.items = data.products || data.data || [];
             this.paginationHtml = data.pagination || '';
             
-            // Refresh l-icons (Lucide) f-l'interface
             this.$nextTick(() => window.createLucideIcons?.());
             
             return data;
@@ -36,13 +29,11 @@ export const baseLogic = (service) => ({
         }
     },
 
-    // Logic dyal Delete li kat-te3awed dima
     async performDelete(id, callback) {
         try {
             const res = await service.delete(id);
             const data = await res.json();
             if (res.ok) {
-                // Kan-ms-ho l-item mn l-array f-l'front bla ma n-refresh-iw
                 this.items = this.items.filter(item => item.id !== id);
                 this.isDeleteModalOpen = false;
                 if (callback) callback(data.message);
@@ -52,7 +43,6 @@ export const baseLogic = (service) => ({
         }
     },
 
-    // Re-initialize Preline UI components
     reinitUI() {
         this.$nextTick(() => {
             if (window.HSStaticMethods) window.HSStaticMethods.autoInit();

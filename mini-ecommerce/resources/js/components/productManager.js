@@ -1,8 +1,6 @@
 import { baseLogic } from './baseComponent.js';
 import { showAlert } from './alerts.js';
 
-/** * 1. Product Service: Hna feyn l-atassal b-l'Backend (Laravel/API)
- */
 const productService = {
     async fetch(url, search, params) {
         const fetchUrl = new URL(url, window.location.origin);
@@ -16,7 +14,6 @@ const productService = {
     },
 
     async save(mode, id, storeUrl, formData) {
-        // Ila kan Edit, ghadi n-diro method PUT f-FormData hit Laravel m3a l-images khassha POST + _method
         let url = mode === 'edit' ? `/admin/products/${id}` : storeUrl;
         if (mode === 'edit') formData.append('_method', 'PUT');
 
@@ -42,13 +39,8 @@ const productService = {
     }
 };
 
-/** * 2. Alpine.js Component
- */
-export default (config = {}) => ({
-    // ... Spread Operator: Kan-akhdo kolshi li f-baseLogic
-    ...baseLogic(productService),
+export default (config = {}) => ({...baseLogic(productService),
 
-    // State dyal Products bohdhom
     products: [],
     allCategories: config.categories || [],
     category: '',
@@ -60,7 +52,6 @@ export default (config = {}) => ({
         this.indexUrl = this.$root.dataset.url;
         this.loadProducts();
 
-        // Watchers: Refresh data mlli t-beddel search aw category
         this.$watch('search', () => this.loadProducts());
         this.$watch('category', () => this.loadProducts());
     },
@@ -68,7 +59,7 @@ export default (config = {}) => ({
     async loadProducts(url = null) {
         const data = await this.fetchData(url, { category_id: this.category });
         if (data) {
-            this.products = this.items; // items jaya mn Base
+            this.products = this.items;
             if (data.categories) this.allCategories = data.categories;
         }
     },
@@ -78,7 +69,7 @@ export default (config = {}) => ({
         this.currentId = null;
         this.isProductModalOpen = true;
         this.resetForm();
-        this.reinitUI(); // Mn Base
+        this.reinitUI();
     },
 
     async saveProduct(e) {
@@ -107,7 +98,6 @@ export default (config = {}) => ({
             form.price.value = product.price;
             form.description.value = product.description || '';
             
-            // Image preview logic
             const preview = document.getElementById('imagePreview');
             if (product.image_url) {
                 preview.src = '/images/' + product.image_url;

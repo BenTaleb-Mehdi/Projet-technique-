@@ -51,7 +51,7 @@ export default (config = {}) => ({
     ...baseLogic(productService),
 
     products: [],
-    allCategories: config.categories || [],
+    allCategories: (config.categories || []).map(c => ({ id: c.id, text: c.label })),
     category: "",
     isProductModalOpen: false,
     mode: "create",
@@ -69,7 +69,7 @@ export default (config = {}) => ({
         const data = await this.fetchData(url, { category_id: this.category });
         if (data) {
             this.products = this.items;
-            if (data.categories) this.allCategories = data.categories;
+            if (data.categories) this.allCategories = data.categories.map(c => ({ id: c.id, text: c.label }));
         }
     },
 
@@ -79,6 +79,7 @@ export default (config = {}) => ({
         this.isProductModalOpen = true;
         this.resetForm();
         this.reinitUI();
+        this.reinitSelect();
     },
 
     async saveProduct(e) {
@@ -101,26 +102,54 @@ export default (config = {}) => ({
     },
 
     editProduct(product) {
-        this.mode = "edit";
-        this.currentId = product.id;
-        this.isProductModalOpen = true;
-        this.errors = {};
+    this.mode = "edit";
+    this.currentId = product.id;
+    this.isProductModalOpen = true;
+    this.errors = {};
 
-        this.$nextTick(() => {
-            const form = document.getElementById("productForm");
-            form.name.value = product.name;
-            form.price.value = product.price;
-            form.description.value = product.description || "";
+    this.$nextTick(() => {
+        const form = document.getElementById("productForm");
+        form.name.value = product.name;
+        form.price.value = product.price;
+        form.description.value = product.description || "";
 
-            const preview = document.getElementById("imagePreview");
-            if (product.image_url) {
-                preview.src = "/images/" + product.image_url;
-                document
-                    .getElementById("previewContainer")
-                    .classList.remove("hidden");
+        // --- ADD THIS FOR CATEGORIES ---
+        const selectEl = document.getElementById("categorySelect");
+        if (selectEl && product.categories) {
+            // Get array of IDs from the product
+            const selectedIds = product.categories.map(c => String(c.id));
+            
+            // Mark the options as selected in the hidden native select
+            Array.from(selectEl.options).forEach(opt => {
+                opt.selected = selectedIds.includes(String(opt.value));
+            });
+
+            // Tell Preline to refresh the UI to show the checkmarks
+            if (window.HSSelect) {
+                window.HSSelect.getInstance(selectEl, true).reinit();
             }
+        }
+        // -------------------------------
 
-            this.reinitUI();
+        const preview = document.getElementById("imagePreview");
+        if (product.image_url) {
+            preview.src = "/images/" + product.image_url;
+            document.getElementById("previewContainer").classList.remove("hidden");
+        }
+        this.reinitUI();
+        this.reinitSelect();
+    });
+},
+
+    reinitSelect() {
+        this.$nextTick(() => {
+            const selectEl = document.getElementById("categorySelect");
+            if (selectEl && window.HSSelect) {
+                const instance = window.HSSelect.getInstance(selectEl, true);
+                if (instance) {
+                    instance.reinit();
+                }
+            }
         });
     },
 
@@ -142,4 +171,16 @@ export default (config = {}) => ({
         document.getElementById("previewContainer").classList.add("hidden");
         this.errors = {};
     },
+    selectAllCategories() {
+    const selectEl = document.getElementById('categorySelect');
+    if (!selectEl) return;
+
+    // Select every option
+    Array.from(selectEl.options).forEach(opt => opt.selected = true);
+
+    // Refresh Preline
+    if (window.HSSelect) {
+        window.HSSelect.getInstance(selectEl, true).reinit();
+    }
+},
 });

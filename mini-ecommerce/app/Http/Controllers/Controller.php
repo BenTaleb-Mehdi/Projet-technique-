@@ -10,16 +10,11 @@ abstract class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
 
-    /**
-     * Overwrite authorize() bach t-khdem bla arguments
-     */
-     public function authorize($ability = null, $arguments = [])
+    public function authorize($ability = null, $arguments = [])
     {
-        // Marki l-flag bch middleware y-3refha dazt mn hna
         app()->instance('auth_checked', true);
 
         if (is_null($ability)) {
-            // Check l-user wach logged in
             return auth()->check() ? true : abort(403);
         }
 

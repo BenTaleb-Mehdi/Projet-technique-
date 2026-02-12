@@ -18,10 +18,12 @@ class RolesAndPermissionsSeeder extends Seeder
         // 2. Create Permissions b tariqa safe
         $p1 = Permission::firstOrCreate(['name' => 'manage-products']);
         $p2 = Permission::firstOrCreate(['name' => 'delete-product']);
+        
 
         // 3. Create Roles b tariqa safe
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
         $sellerRole = Role::firstOrCreate(['name' => 'seller']);
+        $visitorRole = Role::firstOrCreate(['name' => 'visitor']);
 
         // 4. Assign Permissions l Roles
         // Admin 3ndo kolchi
@@ -49,5 +51,15 @@ class RolesAndPermissionsSeeder extends Seeder
             ]
         );
         $sellerUser->assignRole($sellerRole);
+
+        // 7. (Optional) Créer User Visitor bach t-testi bih
+        $visitorUser = User::firstOrCreate(
+            ['email' => 'visitor@test.com'],
+            [
+                'name' => 'Visitor User',
+                'password' => bcrypt('password123'),
+            ]
+        );
+        $visitorUser->assignRole($visitorRole);
     }
 }

@@ -59,18 +59,19 @@ protected function validator(array $data)
 // 2. Save the role to the database
 protected function create(array $data)
 {
-    return User::create([
+    $user = User::create([
         'name' => $data['name'],
         'email' => $data['email'],
         'password' => Hash::make($data['password']),
-        'role' => 'seller', // Default to seller
     ]);
+    $user->assignRole('visitor');
+    return $user;
 }
 
 // 3. Dynamic redirection
 protected function redirectTo()
 {
-    if (auth()->user()->role === 'admin') {
+    if (auth()->user()->hasRole('admin')) {
         return '/admin';
     }
     return '/home';

@@ -71,9 +71,9 @@ protected function create(array $data)
 // 3. Dynamic redirection
 protected function redirectTo()
 {
-    if (auth()->user()->hasRole('admin')) {
+    if (auth()->user()->hasRole('admin') || auth()->user()->hasRole('seller')) {
         return '/admin';
     }
-    return '/home';
+    return '/';
 }
 }

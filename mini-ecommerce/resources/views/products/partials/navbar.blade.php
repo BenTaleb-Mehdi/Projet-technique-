@@ -26,22 +26,22 @@
           </button>
 
           <div class="hs-dropdown-menu transition-[opacity,margin] duration-150 hs-dropdown-open:opacity-100 opacity-0 hidden min-w-48 bg-white border border-gray-200 shadow-lg rounded-xl p-1 mt-2 z-50" role="menu" aria-orientation="vertical" aria-labelledby="hs-dropdown-account">
-            <div class="py-2 px-3 border-b border-gray-100">
+           <div class="py-2 px-3 border-b border-gray-100">
               <p class="text-xs text-gray-500">Role</p>
-              <p class="text-xs font-bold uppercase {{ Auth::user()->role === 'admin' ? 'text-red-600' : 'text-blue-600' }}">
-                {{ Auth::user()->role }}
+              
+              {{-- Njibo l-role l-owl dyal l-user --}}
+              @php $roleName = Auth::user()->getRoleNames()->first(); @endphp
+
+              <p class="text-xs font-bold uppercase {{ $roleName === 'admin' ? 'text-red-600' : 'text-blue-600' }}">
+                {{ $roleName ?? 'No Role' }}
               </p>
             </div>
 
-            @if(Auth::user()->role === 'admin')
-            <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none" href="{{ route('admin.index') }}">
-              <i data-lucide="layout-dashboard" class="size-4"></i> {{ __('views.dashboard') }}
-            </a>
-            @else
-            <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none" href="{{ route('admin.index') }}">
-              <i data-lucide="layout-dashboard" class="size-4"></i> {{ __('views.dashboard') }}
-            </a>
-            @endif
+           @hasanyrole('admin|seller')
+    <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none" href="{{ route('admin.index') }}">
+        <i data-lucide="layout-dashboard" class="size-4"></i> {{ __('views.dashboard') }}
+    </a>
+@endhasanyrole
 
             <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none" href="{{ route('lang.switch', 'en') }}">
               English

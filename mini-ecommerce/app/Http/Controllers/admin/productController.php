@@ -21,7 +21,7 @@ class ProductController extends Controller {private $productService;
 
     public function index(Request $request)
     {
-        $this->authorize();
+        $this->authorize('manage-products');
         $products = $this->productService->getAll($request->all());
         $categories = $this->categoryService->getAll();
         
@@ -37,7 +37,7 @@ class ProductController extends Controller {private $productService;
 
     public function store(StoreProductRequest $request)
     {
-    $this->authorize();
+    $this->authorize('manage-products');
         try {
             $data = $request->validated();
 
@@ -70,7 +70,7 @@ class ProductController extends Controller {private $productService;
 
     public function update(UpdateProductRequest $request, $id)
     {
-       $this->authorize();
+       $this->authorize('manage-products');
         $data = $request->validated();
 
         if ($request->hasFile('image')) {
@@ -95,7 +95,7 @@ class ProductController extends Controller {private $productService;
 
     public function destroy($id)
     {
-       $this->authorize();
+       $this->authorize('delete-product');
         $this->productService->delete($id);
         return response()->json([
             'success' => true,

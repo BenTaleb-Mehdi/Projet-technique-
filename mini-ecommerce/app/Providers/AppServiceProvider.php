@@ -34,9 +34,7 @@ class AppServiceProvider extends ServiceProvider
         });
         */
 
-        Gate::define('is-logged-in', function ($user) {
-                return true; 
-            });
+   
 
 
 

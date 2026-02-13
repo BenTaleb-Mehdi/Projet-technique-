@@ -92,6 +92,7 @@ class ProductController extends Controller {private $productService;
 
     public function destroy($id)
     {
+        
         $this->productService->delete($id);
         return response()->json([
             'success' => true,

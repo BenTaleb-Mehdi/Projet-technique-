@@ -4,7 +4,12 @@
         role="main" 
         class="w-full px-4 sm:px-6 md:px-8" 
         data-url="{{ route('admin.index') }}"
-        x-data="productManager({ categories: {{ $categories->toJson() }} })">   
+        x-data="{
+        currentUserId: {{ auth()->id() }}, 
+    isAdmin: {{ auth()->user()->hasRole('admin') ? 'true' : 'false' }},
+            ...productManager({ categories: {{ $categories->toJson() }} }),
+         
+        }">   
     @include('admin.partials.alert')
     @include('admin.partials.header')
     @include('admin.partials.table')

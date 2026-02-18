@@ -51,7 +51,10 @@ export default (config = {}) => ({
     ...baseLogic(productService),
 
     products: [],
-    allCategories: (config.categories || []).map(c => ({ id: c.id, text: c.label })),
+    allCategories: (config.categories || []).map((c) => ({
+        id: c.id,
+        text: c.label,
+    })),
     category: "",
     isProductModalOpen: false,
     mode: "create",
@@ -69,7 +72,13 @@ export default (config = {}) => ({
         const data = await this.fetchData(url, { category_id: this.category });
         if (data) {
             this.products = this.items;
-            if (data.categories) this.allCategories = data.categories.map(c => ({ id: c.id, text: c.label }));
+            if (data.categories) {
+                this.allCategories = data.categories.map((c) => ({
+                    id: c.id,
+                    text: c.label,
+                }));
+                this.reinitSelect(); // Refresh UI after data load
+            }
         }
     },
 
@@ -78,7 +87,6 @@ export default (config = {}) => ({
         this.currentId = null;
         this.isProductModalOpen = true;
         this.resetForm();
-        this.reinitUI();
         this.reinitSelect();
     },
 
@@ -102,44 +110,40 @@ export default (config = {}) => ({
     },
 
     editProduct(product) {
-    this.mode = "edit";
-    this.currentId = product.id;
-    this.isProductModalOpen = true;
-    this.errors = {};
+        this.mode = "edit";
+        this.currentId = product.id;
+        this.isProductModalOpen = true;
+        this.errors = {};
 
-    this.$nextTick(() => {
-        const form = document.getElementById("productForm");
-        form.name.value = product.name;
-        form.price.value = product.price;
-        form.description.value = product.description || "";
+        this.$nextTick(() => {
+            const form = document.getElementById("productForm");
+            form.name.value = product.name;
+            form.price.value = product.price;
+            form.description.value = product.description || "";
 
-        // --- ADD THIS FOR CATEGORIES ---
-        const selectEl = document.getElementById("categorySelect");
-        if (selectEl && product.categories) {
-            // Get array of IDs from the product
-            const selectedIds = product.categories.map(c => String(c.id));
-            
-            // Mark the options as selected in the hidden native select
-            Array.from(selectEl.options).forEach(opt => {
-                opt.selected = selectedIds.includes(String(opt.value));
-            });
-
-            // Tell Preline to refresh the UI to show the checkmarks
-            if (window.HSSelect) {
-                window.HSSelect.getInstance(selectEl, true).reinit();
+            // Sync Categories
+            const selectEl = document.getElementById("categorySelect");
+            if (selectEl && product.categories) {
+                const selectedIds = product.categories.map((c) => String(c.id));
+                Array.from(selectEl.options).forEach((opt) => {
+                    opt.selected = selectedIds.includes(String(opt.value));
+                });
             }
-        }
-        // -------------------------------
 
-        const preview = document.getElementById("imagePreview");
-        if (product.image_url) {
-            preview.src = "/images/" + product.image_url;
-            document.getElementById("previewContainer").classList.remove("hidden");
-        }
-        this.reinitUI();
-        this.reinitSelect();
-    });
-},
+            // Sync Image Preview
+            const preview = document.getElementById("imagePreview");
+            const container = document.getElementById("previewContainer");
+            if (product.image_url) {
+                preview.src = "/images/" + product.image_url;
+                container.classList.remove("hidden");
+            } else {
+                container.classList.add("hidden");
+            }
+
+            this.reinitUI(); // From baseLogic
+            this.reinitSelect(); // Refresh Select UI specifically
+        });
+    },
 
     reinitSelect() {
         this.$nextTick(() => {
@@ -148,9 +152,28 @@ export default (config = {}) => ({
                 const instance = window.HSSelect.getInstance(selectEl, true);
                 if (instance) {
                     instance.reinit();
+                } else {
+                    window.HSSelect.autoInit();
                 }
             }
         });
+    },
+
+    resetForm() {
+        const form = document.getElementById("productForm");
+        if (form) form.reset();
+
+        // Clear Select UI
+        const selectEl = document.getElementById("categorySelect");
+        if (selectEl) {
+            Array.from(selectEl.options).forEach(
+                (opt) => (opt.selected = false),
+            );
+            this.reinitSelect();
+        }
+
+        document.getElementById("previewContainer").classList.add("hidden");
+        this.errors = {};
     },
 
     confirmDelete(id) {
@@ -158,29 +181,29 @@ export default (config = {}) => ({
         this.isDeleteModalOpen = true;
     },
 
-    deleteProduct() {
-        this.performDelete(this.idToDelete, (msg) => {
-            this.products = this.items;
-            showAlert(msg);
+    async deleteProduct() {
+        if (!this.idToDelete) return;
+        
+        await this.performDelete(this.idToDelete, (message) => {
+            showAlert(message || 'Product deleted successfully');
+            this.loadProducts();
         });
+        
+        this.idToDelete = null;
     },
 
-    resetForm() {
-        const form = document.getElementById("productForm");
-        if (form) form.reset();
-        document.getElementById("previewContainer").classList.add("hidden");
-        this.errors = {};
+    handleImageChange(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const preview = document.getElementById("imagePreview");
+                preview.src = e.target.result;
+                document
+                    .getElementById("previewContainer")
+                    .classList.remove("hidden");
+            };
+            reader.readAsDataURL(file);
+        }
     },
-    selectAllCategories() {
-    const selectEl = document.getElementById('categorySelect');
-    if (!selectEl) return;
-
-    // Select every option
-    Array.from(selectEl.options).forEach(opt => opt.selected = true);
-
-    // Refresh Preline
-    if (window.HSSelect) {
-        window.HSSelect.getInstance(selectEl, true).reinit();
-    }
-},
 });

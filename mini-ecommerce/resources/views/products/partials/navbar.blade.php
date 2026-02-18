@@ -37,7 +37,7 @@
               </p>
             </div>
 
-         @can('manage-products')
+         @can('view-products')
               <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none" href="{{ route('admin.index') }}">
                   <i data-lucide="layout-dashboard" class="size-4"></i> {{ __('views.dashboard') }}
               </a>

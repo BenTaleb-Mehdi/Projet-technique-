@@ -8,9 +8,10 @@ use App\Http\Requests\Admin\UpdateProductRequest;
 use App\Services\CategoryService;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
-use App\Models\Category;
 
-class ProductController extends Controller {private $productService;
+class ProductController extends Controller 
+{
+    private $productService;
     private $categoryService; 
 
     public function __construct(ProductService $productService, CategoryService $categoryService)
@@ -21,7 +22,9 @@ class ProductController extends Controller {private $productService;
 
     public function index(Request $request)
     {
-        $this->authorize('manage-products');
+        // Kan-verifiw wach 3ndo l-haq i-chouf (Admin, Seller, Visitor)
+        $this->authorize('view-products');
+
         $products = $this->productService->getAll($request->all());
         $categories = $this->categoryService->getAll();
         
@@ -37,10 +40,11 @@ class ProductController extends Controller {private $productService;
 
     public function store(StoreProductRequest $request)
     {
-    $this->authorize('manage-products');
+        // Kan-verifiw l-creer (Admin, Seller)
+        $this->authorize('create-products');
+
         try {
             $data = $request->validated();
-
             $data['user_id'] = auth()->id();
 
             if ($request->hasFile('image')) {
@@ -51,7 +55,6 @@ class ProductController extends Controller {private $productService;
             }
 
             $product = $this->productService->create($data);
-
             $product->load('categories');
 
             if ($request->ajax()) {
@@ -70,7 +73,9 @@ class ProductController extends Controller {private $productService;
 
     public function update(UpdateProductRequest $request, $id)
     {
-       $this->authorize('manage-products');
+        // Kan-verifiw l-update (Admin, Seller)
+        $this->authorize('edit-products');
+
         $data = $request->validated();
 
         if ($request->hasFile('image')) {
@@ -93,9 +98,21 @@ class ProductController extends Controller {private $productService;
         return view('admin.partials.row', compact('product'));
     }
 
+
     public function destroy($id)
     {
-       $this->authorize('delete-product');
+        $this->authorize('delete-products');
+        
+        $product = $this->productService->find($id);
+        
+        // Sellers can only delete their own products, admins can delete any product
+        if (!auth()->user()->hasRole('admin') && $product->user_id !== auth()->id()) {
+            return response()->json([
+                'success' => false,
+                'message' => __('actions.unauthorized_delete')
+            ], 403);
+        }
+
         $this->productService->delete($id);
         return response()->json([
             'success' => true,

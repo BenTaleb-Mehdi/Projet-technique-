@@ -32,8 +32,11 @@
                                     <button type="button" @click="editProduct(product)" class="text-indigo-500 hover:text-indigo-900 font-semibold">
                                         <i data-lucide="pencil" class="size-4"></i>
                                     </button>
-                                    @can('delete-product')
-                                    <button type="button" @click="confirmDelete(product.id)" class="text-red-500 hover:text-red-800 font-semibold">
+                                    @can('delete-products')
+                                    <button type="button" 
+                                            x-show="isAdmin || product.user_id == currentUserId"
+                                            @click="confirmDelete(product.id)" 
+                                            class="text-red-500 hover:text-red-800 font-semibold">
                                         <i data-lucide="trash-2" class="size-4"></i>
                                     </button>
                                     @endcan

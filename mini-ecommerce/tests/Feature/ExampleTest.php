@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 use App\Services\ProductService;
 use Mockery;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ExampleTest extends TestCase
 {
@@ -17,7 +17,8 @@ class ExampleTest extends TestCase
     public function test_the_application_returns_a_successful_response(): void
     {
         $mockService = Mockery::mock(ProductService::class);
-        $mockService->shouldReceive('getAll')->once()->andReturn(new Collection());
+        $paginator = new LengthAwarePaginator([], 0, 10);
+        $mockService->shouldReceive('getAll')->once()->andReturn($paginator);
 
         $this->instance(ProductService::class, $mockService);
 

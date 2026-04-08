@@ -6,9 +6,12 @@ use Tests\TestCase;
 use App\Models\Category;
 use App\Services\CategoryService;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class CategoryServiceTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected CategoryService $service;
 
     protected function setUp(): void
@@ -19,7 +22,9 @@ class CategoryServiceTest extends TestCase
 
     public function test_it_can_get_all_categories()
     {
+        Category::factory()->count(3)->create();
+
         $categories = $this->service->getAll();
-        $this->assertGreaterThan(0, $categories->count());
+        $this->assertEquals(3, $categories->count());
     }
 }

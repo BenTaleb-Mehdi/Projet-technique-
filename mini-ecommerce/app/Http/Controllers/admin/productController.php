@@ -22,7 +22,6 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
-        // Kan-verifiw wach 3ndo l-haq i-chouf (Admin, Seller, Visitor)
         $this->authorize('view-products');
 
         $products = $this->productService->getAll($request->all());

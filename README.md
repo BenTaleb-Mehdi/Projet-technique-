@@ -77,6 +77,7 @@ style: |
 9. Vite
 10. Preline Ui
 11. Lucide Library (icons)
+12. Tests Unitaires
 
 
 ---
